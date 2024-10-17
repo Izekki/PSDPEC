@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" stylesheets="@../CSS/mainScreenStyle.css">
+   <top>
+      <Text text="¿Quién usa el sistema?" styleClass="title" />
+   </top>
+
+   <center>
+      <VBox>
+         <HBox>
+            <Button fx:id="btnAlumno" styleClass="button">
+               <graphic>
+                  <ImageView styleClass="image-view">
+                     <Image url="@../../Media/Iconos/5.png" />
+                  </ImageView>
+               </graphic>
+               Alumno
+            </Button>
+
+            <Button fx:id="btnAdministrador" styleClass="button">
+               <graphic>
+                  <ImageView styleClass="image-view">
+                     <Image url="@../../Media/Iconos/7.png" />
+                  </ImageView>
+               </graphic>
+               Administrador
+            </Button>
+         </HBox>
+      </VBox>
+   </center>
+</BorderPane>

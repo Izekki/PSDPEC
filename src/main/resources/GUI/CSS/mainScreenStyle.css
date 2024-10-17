@@ -1,0 +1,25 @@
+.title {
+    -fx-font-size: 36px; /* Tamaño inicial del texto */
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+    -fx-alignment: CENTER; /* Centrar el texto */
+}
+
+.button {
+    -fx-pref-width: 200px; /* Ancho preferido inicial */
+    -fx-pref-height: 200px; /* Alto preferido inicial */
+    -fx-max-width: 300px; /* Ancho máximo */
+    -fx-max-height: 300px; /* Alto máximo */
+
+}
+
+.image-view {
+    -fx-fit-width: 100;   /* Ajusta el ancho de la imagen */
+    -fx-fit-height: 100;  /* Ajusta el alto de la imagen */
+}
+
+/* Estilo para el VBox para asegurarse de que tenga un tamaño mínimo */
+.center {
+    -fx-min-width: 400px;  /* Ancho mínimo del panel */
+    -fx-min-height: 400px; /* Alto mínimo del panel */
+}

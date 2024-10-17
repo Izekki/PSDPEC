@@ -1,4 +1,4 @@
-package com.champico.Entitys;
+package com.champico.BACK.Entitys;
 
 import jakarta.persistence.*;
 
