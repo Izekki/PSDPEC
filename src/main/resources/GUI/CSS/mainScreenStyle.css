@@ -23,3 +23,8 @@
     -fx-min-width: 400px;  /* Ancho mínimo del panel */
     -fx-min-height: 400px; /* Alto mínimo del panel */
 }
+
+.label{
+    -fx-min-width: 50px;
+    -fx-min-height: 50px;
+}

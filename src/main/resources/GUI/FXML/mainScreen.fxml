@@ -1,41 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.control.Label?>
 
+<GridPane xmlns:fx="http://javafx.com/fxml" alignment="CENTER" hgap="10" vgap="10" stylesheets="@../CSS/mainScreenStyle.css">
 
+   <!-- Label en la esquina superior izquierda (celda 0,0) -->
+   <Label text=" " GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label-empty" />
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" stylesheets="@../CSS/mainScreenStyle.css">
-   <top>
+   <!-- Espaciador (celdas 1,0 y 1,2 son vacías para centrado) -->
+
+   <!-- Label en la esquina superior derecha (celda 2,2) -->
+   <Label text="Etiqueta derecha" GridPane.columnIndex="2" GridPane.rowIndex="2" styleClass="label-empty" />
+
+   <!-- Espaciador (celda 0,1 es vacía) -->
+
+   <!-- VBox centrado en la celda del medio (celda 1,1) -->
+   <VBox alignment="CENTER" spacing="20" GridPane.columnIndex="1" GridPane.rowIndex="1">
       <Text text="¿Quién usa el sistema?" styleClass="title" />
-   </top>
+      <HBox alignment="CENTER" spacing="20">
+         <Button fx:id="btnAlumno" styleClass="button">
+            <graphic>
+               <ImageView styleClass="image-view">
+                  <Image url="@../../Media/Iconos/5.png" />
+               </ImageView>
+            </graphic>
+            Alumno
+         </Button>
 
-   <center>
-      <VBox>
-         <HBox>
-            <Button fx:id="btnAlumno" styleClass="button">
-               <graphic>
-                  <ImageView styleClass="image-view">
-                     <Image url="@../../Media/Iconos/5.png" />
-                  </ImageView>
-               </graphic>
-               Alumno
-            </Button>
+         <Button fx:id="btnAdministrador" styleClass="button">
+            <graphic>
+               <ImageView styleClass="image-view">
+                  <Image url="@../../Media/Iconos/7.png" />
+               </ImageView>
+            </graphic>
+            Administrador
+         </Button>
+      </HBox>
+   </VBox>
 
-            <Button fx:id="btnAdministrador" styleClass="button">
-               <graphic>
-                  <ImageView styleClass="image-view">
-                     <Image url="@../../Media/Iconos/7.png" />
-                  </ImageView>
-               </graphic>
-               Administrador
-            </Button>
-         </HBox>
-      </VBox>
-   </center>
-</BorderPane>
+   <!-- Espaciadores en las otras celdas para mantener el diseño limpio -->
+</GridPane>
