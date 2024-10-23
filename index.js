@@ -26,7 +26,7 @@ app.get('/form-student', (req, res) => {
 
   // Ruta para la página del formulario del profesor
 app.get('/form-teacher', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'htmls', 'index-teacher.html'));
+    res.sendFile(path.join(__dirname, 'public', 'htmls', 'form-teacher.html'));
   });
   
 
