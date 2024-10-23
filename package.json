@@ -1,0 +1,19 @@
+{
+  "name": "psdpec",
+  "version": "1.0.0",
+  "description": "proyecto sistema de prestamo de equipos de computo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Izekki/PSDPEC.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Izekki/PSDPEC/issues"
+  },
+  "homepage": "https://github.com/Izekki/PSDPEC#readme"
+}
