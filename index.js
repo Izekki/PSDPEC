@@ -11,12 +11,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta para la página de login
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'html', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'htmls', 'login.html'));
 });
 
 // Ruta para la página del formulario
-app.get('/formulario', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'html', 'formulario.html'));
+app.get('/index-form', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'htmls', 'index-form.html'));
 });
 
 // Ruta POST para procesar el login
