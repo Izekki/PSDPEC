@@ -19,6 +19,19 @@ app.get('/index-form', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'htmls', 'index-form.html'));
 });
 
+// Ruta para la página del formulario del estudiante
+app.get('/form-student', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'htmls', 'form-student.html'));
+  });
+
+  // Ruta para la página del formulario del profesor
+app.get('/form-teacher', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'htmls', 'index-teacher.html'));
+  });
+  
+
+
+
 // Ruta POST para procesar el login
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
