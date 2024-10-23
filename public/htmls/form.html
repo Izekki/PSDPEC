@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario</title>
+    <link rel="stylesheet" href="../css/form-style.css">
+</head>
+<body>
+    <div class="form-container">
+        <form action="/public/htmls/form.html" method="">\
+            <h1>Solicitud de Préstamos</h1>
+            <h2>Equipos de computo</h2>
+            <label for="matricula">Matricula:</label>
+            <input type="text" name="matricula" id="matricula" required>
+            <label for="tipo-equipo">Tipo de equipo:</label>
+            <select name="equipo" id="equipo" required>
+                <option value="" disabled selected hidden>-- Selecciona un tipo --</option>
+                <option value="laptop">Laptop</option>
+                <option value="pc">Pc</option>
+                <option value="proyector">Proyector</option>
+                <option value="cable-red">Cable de Red</option>
+                <option value="camara">Cámara</option>
+                <option value="adaptador-red">Adaptador de Red</option>
+            </select>
+            
+            <label for="ubicacion">Ubicación:</label>
+                <input type="text" id="ubicacion" name="ubicacion" required>
+    
+                <label for="fecha-inicio">Fecha de inicio:</label>
+                <input type="date" id="fecha-inicio" name="fecha-inicio" required>
+    
+                <label for="fecha-fin">Fecha de fin:</label>
+                <input type="date" id="fecha-fin" name="fecha-fin" required>
+
+                <button type="submit">Enviar</button>
+        </form>
+    </div>
+</body>
+</html>
