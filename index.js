@@ -49,30 +49,48 @@ app.get('/form-student', (req, res) => {
 app.get('/form-teacher', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'htmls', 'form-teacher.html'));
   });
-  
 
 
+// Ruta POST para procesar el formulario y registrar la solicitud en la tabla "solicitudes"
+app.post('/enviar-solicitud', (req, res) => {
+    const { matricula, equipo, ubicacion, 'fecha-inicio': fechaInicio, 'fecha-fin': fechaFin } = req.body;
 
-// Ruta POST para procesar el login
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // Consulta a la base de datos para validar las credenciales
-    const query = 'SELECT * FROM usuarios WHERE username = ? AND password = ?';
-    connection.query(query, [username, password], (err, results) => {
+    // Encontrar el ID del equipo según el tipo de equipo seleccionado
+    const queryEquipo = 'SELECT id_equipo FROM equipos WHERE tipo_equipo = ? AND estado = "Disponible" LIMIT 1';
+    connection.query(queryEquipo, [equipo], (err, results) => {
         if (err) {
-            console.error('Error ejecutando la consulta:', err);
-            res.send('Hubo un error al procesar tu solicitud.');
+            console.error('Error al buscar el equipo:', err);
+            res.send('Error al buscar el equipo.');
+            return;
         }
 
-        // Si encuentra un resultado, las credenciales son correctas
-        if (results.length > 0) {
-            res.redirect('/formulario'); // Redirige al formulario si el login es exitoso
-        } else {
-            res.send('Usuario o contraseña incorrectos');
+        if (results.length === 0) {
+            res.send('El equipo solicitado no está disponible.');
+            return;
         }
+
+        const idEquipo = results[0].id_equipo;
+
+        // Insertar la solicitud en la tabla "solicitudes"
+        const querySolicitud = 'INSERT INTO solicitudes (tipo_usuario, correo, estado, fecha_inicio, fecha_entrega, ubicacion_actual, id_equipo) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        connection.query(querySolicitud, ['profesor', 'itez@uv.mx', 'Pendiente', fechaInicio, fechaFin, ubicacion, idEquipo], (err, result) => {
+            if (err) {
+                console.error('Error al registrar la solicitud:', err);
+                res.send('Hubo un error al registrar la solicitud.');
+            } else {
+                console.log('Solicitud registrada con éxito');
+                res.send('Solicitud enviada correctamente.');
+            }
+        });
     });
 });
+
+
+
+
+
+
+
 
 
 // Inicia el servidor
