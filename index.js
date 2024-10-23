@@ -3,6 +3,27 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 
+const mysql = require('mysql');
+
+//Create conection to data base
+const connection = mysql.createConnection({
+    host: 'localhost',      
+    user: 'root',       
+    password: 'password2024', 
+    database: 'prestamouv'
+});
+
+//Connection to data base
+connection.connect((err) => {
+    if (err) {
+        console.error('Error conectando a la base de datos:', err);
+        return;
+    }
+    console.log('Conexión exitosa a la base de datos MySQL');
+});
+
+
+
 // Middleware para analizar datos de formularios
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -34,15 +55,25 @@ app.get('/form-teacher', (req, res) => {
 
 // Ruta POST para procesar el login
 app.post('/login', (req, res) => {
-  const { username, password } = req.body;
+    const { username, password } = req.body;
 
-  // Aquí validas contra tu base de datos o un objeto de prueba
-  if (username === 'usuario' && password === '12345') {
-    res.redirect('/formulario');  // Redirige al formulario si es correcto
-  } else {
-    res.send('Usuario o contraseña incorrectos');  // Muestra mensaje si es incorrecto
-  }
+    // Consulta a la base de datos para validar las credenciales
+    const query = 'SELECT * FROM usuarios WHERE username = ? AND password = ?';
+    connection.query(query, [username, password], (err, results) => {
+        if (err) {
+            console.error('Error ejecutando la consulta:', err);
+            res.send('Hubo un error al procesar tu solicitud.');
+        }
+
+        // Si encuentra un resultado, las credenciales son correctas
+        if (results.length > 0) {
+            res.redirect('/formulario'); // Redirige al formulario si el login es exitoso
+        } else {
+            res.send('Usuario o contraseña incorrectos');
+        }
+    });
 });
+
 
 // Inicia el servidor
 const PORT = process.env.PORT || 3000;
