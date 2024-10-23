@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Izekki/PSDPEC/issues"
   },
-  "homepage": "https://github.com/Izekki/PSDPEC#readme"
+  "homepage": "https://github.com/Izekki/PSDPEC#readme",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
 }
