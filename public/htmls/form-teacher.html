@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="form-container">
-        <form action="/enviar-solicitud" method="POS">\
+        <form action="/enviar-solicitud" method="POST">
             <h1>Solicitud de Préstamos de Computo</h1>
             <h2>Profesor</h2>
             <label for="matricula">Matricula:</label>
@@ -33,6 +33,7 @@
                 <label for="fecha-fin">Fecha de fin:</label>
                 <input type="date" id="fecha-fin" name="fecha-fin" required>
 
+                <div id="error-message" style="color: red;"></div>
                 <button type="submit">Enviar</button>
         </form>
     </div>

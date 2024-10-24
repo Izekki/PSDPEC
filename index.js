@@ -3,7 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 //Create conection to data base
 const connection = mysql.createConnection({
