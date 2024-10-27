@@ -36,4 +36,105 @@ router.post('/enviar-solicitud', (req, res) => {
     });
 });
 
+
+// Ruta para validar credenciales de inicio de sesión
+router.post('/login', (req, res) => {
+    const { correo, contrasenia } = req.body;
+    
+    // Consulta para verificar las credenciales en la tabla 'administradores'
+    const query = 'SELECT * FROM administradores WHERE correo = ? AND contrasenia = ?';
+
+    connection.query(query, [correo, contrasenia], (err, results) => {
+        if (err) {
+            console.error('Error al verificar las credenciales:', err);
+            res.status(500).send('Error en el servidor');
+            return;
+        }
+
+        if (results.length > 0) {
+            // Redirigir al usuario a una página de éxito (reemplaza 'pagina-de-exito.html' con la página final)
+            res.redirect('/htmls/admin-view.html');
+        } else {
+            // Credenciales incorrectas
+            res.status(401).send('Credenciales incorrectas');
+        }
+    });
+});
+
+// Listar todas las solicitudes de préstamo
+router.get('/listar', (req, res) => {
+    const query = 'SELECT * FROM solicitudes';
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Error al listar solicitudes:', err);
+            res.status(500).json({ error: 'Error al obtener las solicitudes' });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+// Aprobar una solicitud de préstamo
+router.post('/aprobar/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'UPDATE solicitudes SET estado = "Aprobada" WHERE id = ?';
+    connection.query(query, [id], (err, result) => {
+        if (err) {
+            console.error('Error al aprobar la solicitud:', err);
+            res.status(500).json({ error: 'Error al aprobar la solicitud' });
+        } else {
+            res.json({ message: 'Solicitud aprobada correctamente' });
+        }
+    });
+});
+
+// Rechazar una solicitud de préstamo
+router.post('/rechazar/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'UPDATE solicitudes SET estado = "Rechazada" WHERE id = ?';
+    connection.query(query, [id], (err, result) => {
+        if (err) {
+            console.error('Error al rechazar la solicitud:', err);
+            res.status(500).json({ error: 'Error al rechazar la solicitud' });
+        } else {
+            res.json({ message: 'Solicitud rechazada correctamente' });
+        }
+    });
+});
+
+// Eliminar una solicitud de préstamo
+router.delete('/eliminar/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'DELETE FROM solicitudes WHERE id = ?';
+    connection.query(query, [id], (err, result) => {
+        if (err) {
+            console.error('Error al eliminar la solicitud:', err);
+            res.status(500).json({ error: 'Error al eliminar la solicitud' });
+        } else {
+            res.json({ message: 'Solicitud eliminada correctamente' });
+        }
+    });
+});
+
+// Obtener estadísticas de solicitudes
+router.get('/estadisticas', (req, res) => {
+    const query = `
+        SELECT 
+            COUNT(*) AS total,
+            SUM(CASE WHEN estado = 'Aprobada' THEN 1 ELSE 0 END) AS aprobadas,
+            SUM(CASE WHEN estado = 'Rechazada' THEN 1 ELSE 0 END) AS rechazadas,
+            SUM(CASE WHEN estado = 'Pendiente' THEN 1 ELSE 0 END) AS pendientes
+        FROM solicitudes
+    `;
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Error al obtener estadísticas:', err);
+            res.status(500).json({ error: 'Error al obtener estadísticas' });
+        } else {
+            res.json(results[0]);
+        }
+    });
+});
+
+
 module.exports = router;

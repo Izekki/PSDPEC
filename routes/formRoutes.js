@@ -10,5 +10,10 @@ router.get('/student', (req, res) => {
 router.get('/teacher', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/htmls/form-teacher.html'));
 });
+ 
+// AGREGAR HTML INICIAR SESIONr
+router.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/htmls/login.html'));
+})
 
 module.exports = router;

@@ -1,7 +1,7 @@
 
 /* F O N D O */
 body {
-    font-family: sans-serif, Arial;
+    font-family: Roboto ,sans-serif, Arial;
     background-color: #eeeeee;
     display: flex;
     justify-content: center;
@@ -16,6 +16,7 @@ h2{
     font-size: 3em;
     color: #222222;
     text-align: center;
+
 }
 
 
@@ -120,3 +121,4 @@ h2{
     color: #333;
     text-align: center;
 }
+
