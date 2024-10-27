@@ -62,14 +62,21 @@ router.post('/login', (req, res) => {
 });
 
 
-// Listar todas las solicitudes de préstamo
+// Listar todas las solicitudes de préstamo con el nombre del equipo
 router.get('/listar', (req, res) => {
-    const query = 'SELECT * FROM solicitudes';
+    const query = `
+        SELECT s.id_solicitud, s.tipo_usuario, s.correo, s.estado, 
+               s.fecha_inicio, s.fecha_entrega, s.ubicacion_actual,
+               (SELECT e.tipo_equipo FROM equipos e WHERE e.id_equipo = s.id_equipo) AS nombre_equipo
+        FROM solicitudes s
+    `;
+
     connection.query(query, (err, results) => {
         if (err) {
             console.error('Error al listar solicitudes:', err);
             res.status(500).json({ error: 'Error al obtener las solicitudes' });
         } else {
+            console.log('Resultados de la consulta:', results); // Para depuración
             res.json(results);
         }
     });
@@ -78,14 +85,22 @@ router.get('/listar', (req, res) => {
 // Aprobar una solicitud de préstamo
 router.post('/aprobar/:id', (req, res) => {
     const { id } = req.params;
-    const query = 'UPDATE solicitudes SET estado = "Aprobada" WHERE id = ?';
+
+    // Actualizamos el estado a "Aprobada"
+    const query = 'UPDATE solicitudes SET estado = "Aprobada" WHERE id_solicitud = ?';
     connection.query(query, [id], (err, result) => {
         if (err) {
             console.error('Error al aprobar la solicitud:', err);
-            res.status(500).json({ error: 'Error al aprobar la solicitud' });
-        } else {
-            res.json({ message: 'Solicitud aprobada correctamente' });
+            return res.status(500).json({ error: 'Error al aprobar la solicitud' });
         }
+
+        // Comprobamos si se actualizó alguna fila
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Solicitud no encontrada' });
+        }
+
+        // Mensaje de éxito
+        res.json({ message: 'Solicitud aprobada correctamente' });
     });
 });
 

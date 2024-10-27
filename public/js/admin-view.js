@@ -14,17 +14,18 @@ function loadRequests() {
             data.forEach(request => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${request.id}</td>
-                    <td>${request.usuario}</td>
-                    <td>${request.equipo}</td>
-                    <td>${request.ubicacion}</td>
+                    <td>${request.id_solicitud}</td>
+                    <td>${request.tipo_usuario}</td>
+                    <td>${request.correo || 'No especificado'}</td>
+                    <td>${request.ubicacion_actual || 'No especificado'}</td>
                     <td>${request.fecha_inicio}</td>
-                    <td>${request.fecha_fin}</td>
+                    <td>${request.fecha_entrega}</td>
                     <td>${request.estado}</td>
+                    <td>${request.nombre_equipo || 'No especificado'}</td>
                     <td>
-                        <button onclick="approveRequest(${request.id})">Aceptar</button>
-                        <button onclick="rejectRequest(${request.id})">Rechazar</button>
-                        <button onclick="deleteRequest(${request.id})">Eliminar</button>
+                        <button onclick="approveRequest(${request.id_solicitud})">Aceptar</button>
+                        <button onclick="rejectRequest(${request.id_solicitud})">Rechazar</button>
+                        <button onclick="deleteRequest(${request.id_solicitud})">Eliminar</button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -50,9 +51,20 @@ function loadStatistics() {
 
 function approveRequest(id) {
     fetch(`/solicitudes/aprobar/${id}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => loadRequests())
-        .catch(error => console.error('Error al aprobar solicitud:', error));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message); // Muestra el mensaje de éxito
+            loadRequests(); // Vuelve a cargar las solicitudes para mostrar los cambios
+        })
+        .catch(error => {
+            console.error('Error al aprobar solicitud:', error);
+            alert('Ocurrió un error al aprobar la solicitud. Inténtalo de nuevo.'); // Notifica al usuario del error
+        });
 }
 
 function rejectRequest(id) {
