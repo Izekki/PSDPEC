@@ -61,6 +61,7 @@ router.post('/login', (req, res) => {
     });
 });
 
+
 // Listar todas las solicitudes de préstamo
 router.get('/listar', (req, res) => {
     const query = 'SELECT * FROM solicitudes';

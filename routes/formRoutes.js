@@ -11,13 +11,12 @@ router.get('/teacher', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/htmls/form-teacher.html'));
 });
  
-// AGREGAR HTML INICIAR SESIONr
 router.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/htmls/login.html'));
 })
 
 router.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/html/admin-view.html'));
+    res.sendFile(path.join(__dirname, '../public/htmls/admin-view.html'));
 });
 
 
