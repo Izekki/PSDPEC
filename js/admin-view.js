@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadRequests() {
+    console.log('Cargando solicitudes...');
     fetch('/solicitudes/listar')
         .then(response => response.json())
         .then(data => {

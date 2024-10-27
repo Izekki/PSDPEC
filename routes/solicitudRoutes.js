@@ -53,7 +53,7 @@ router.post('/login', (req, res) => {
 
         if (results.length > 0) {
             // Redirigir al usuario a una página de éxito (reemplaza 'pagina-de-exito.html' con la página final)
-            res.redirect('/htmls/admin-view.html');
+            res.redirect('/formularios/admin');
         } else {
             // Credenciales incorrectas
             res.status(401).send('Credenciales incorrectas');
