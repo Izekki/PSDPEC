@@ -2,6 +2,32 @@ const express = require('express');
 const router = express.Router();
 const connection = require('../db/connection');
 
+
+// Ruta para validar credenciales de inicio de sesión
+router.post('/login', (req, res) => {
+    const { correo, contrasenia } = req.body;
+    
+    // Consulta para verificar las credenciales en la tabla 'administradores'
+    const query = 'SELECT * FROM administradores WHERE correo = ? AND contrasenia = ?';
+
+    connection.query(query, [correo, contrasenia], (err, results) => {
+        if (err) {
+            console.error('Error al verificar las credenciales:', err);
+            res.status(500).send('Error en el servidor');
+            return;
+        }
+
+        if (results.length > 0) {
+            // Redirigir al usuario a una página de éxito (reemplaza 'pagina-de-exito.html' con la página final)
+            res.redirect('/formularios/admin');
+        } else {
+            // Credenciales incorrectas
+            res.status(401).send('Credenciales incorrectas');
+        }
+    });
+});
+
+
 // Ruta para enviar solicitudes
 router.post('/enviar-solicitud', (req, res) => {
     const { matricula, equipo, ubicacion, 'fecha-inicio': fechaInicio, 'fecha-fin': fechaFin, tipo_usuario } = req.body;
@@ -41,30 +67,6 @@ router.post('/enviar-solicitud', (req, res) => {
 });
 
 
-
-// Ruta para validar credenciales de inicio de sesión
-router.post('/login', (req, res) => {
-    const { correo, contrasenia } = req.body;
-    
-    // Consulta para verificar las credenciales en la tabla 'administradores'
-    const query = 'SELECT * FROM administradores WHERE correo = ? AND contrasenia = ?';
-
-    connection.query(query, [correo, contrasenia], (err, results) => {
-        if (err) {
-            console.error('Error al verificar las credenciales:', err);
-            res.status(500).send('Error en el servidor');
-            return;
-        }
-
-        if (results.length > 0) {
-            // Redirigir al usuario a una página de éxito (reemplaza 'pagina-de-exito.html' con la página final)
-            res.redirect('/formularios/admin');
-        } else {
-            // Credenciales incorrectas
-            res.status(401).send('Credenciales incorrectas');
-        }
-    });
-});
 
 
 // Listar todas las solicitudes de préstamo con el nombre del equipo
@@ -112,7 +114,7 @@ router.post('/aprobar/:id', (req, res) => {
 // Rechazar una solicitud de préstamo
 router.post('/rechazar/:id', (req, res) => {
     const { id } = req.params;
-    const query = 'UPDATE solicitudes SET estado = "Rechazada" WHERE id = ?';
+    const query = 'UPDATE solicitudes SET estado = "Rechazada" WHERE id_solicitud = ?';
     connection.query(query, [id], (err, result) => {
         if (err) {
             console.error('Error al rechazar la solicitud:', err);
@@ -126,7 +128,7 @@ router.post('/rechazar/:id', (req, res) => {
 // Eliminar una solicitud de préstamo
 router.delete('/eliminar/:id', (req, res) => {
     const { id } = req.params;
-    const query = 'DELETE FROM solicitudes WHERE id = ?';
+    const query = 'DELETE FROM solicitudes WHERE id_solicitud = ?';
     connection.query(query, [id], (err, result) => {
         if (err) {
             console.error('Error al eliminar la solicitud:', err);

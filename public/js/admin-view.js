@@ -58,12 +58,12 @@ function approveRequest(id) {
             return response.json();
         })
         .then(data => {
-            alert(data.message); // Muestra el mensaje de éxito
-            loadRequests(); // Vuelve a cargar las solicitudes para mostrar los cambios
+            alert(data.message);
+            loadRequests();
         })
         .catch(error => {
             console.error('Error al aprobar solicitud:', error);
-            alert('Ocurrió un error al aprobar la solicitud. Inténtalo de nuevo.'); // Notifica al usuario del error
+            alert('Ocurrió un error al aprobar la solicitud. Inténtalo de nuevo.');
         });
 }
 
