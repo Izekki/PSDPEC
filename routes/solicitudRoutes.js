@@ -4,37 +4,42 @@ const connection = require('../db/connection');
 
 // Ruta para enviar solicitudes
 router.post('/enviar-solicitud', (req, res) => {
-    const { matricula, equipo, ubicacion, 'fecha-inicio': fechaInicio, 'fecha-fin': fechaFin } = req.body;
-    
-    // Encontrar el ID del equipo según el tipo de equipo seleccionado
+    const { matricula, equipo, ubicacion, 'fecha-inicio': fechaInicio, 'fecha-fin': fechaFin, tipo_usuario } = req.body;
+
+    // Validar el tipo de usuario
+    if (!['teacher', 'student', 'tecnico'].includes(tipo_usuario)) {
+        return res.status(400).json({ error: 'Tipo de usuario inválido' });
+    }
+
+    // Buscar el ID del equipo según el tipo
     const queryEquipo = 'SELECT id_equipo FROM equipos WHERE tipo_equipo = ? AND estado = "Disponible" LIMIT 1';
     connection.query(queryEquipo, [equipo], (err, results) => {
         if (err) {
             console.error('Error al buscar el equipo:', err);
-            res.send('Error al buscar el equipo.');
+            res.status(500).send('Error al buscar el equipo.');
             return;
         }
 
         if (results.length === 0) {
-            res.send('El equipo solicitado no está disponible.');
+            res.status(400).send('El equipo solicitado no está disponible.');
             return;
         }
 
         const idEquipo = results[0].id_equipo;
 
         // Insertar la solicitud en la tabla "solicitudes"
-        const querySolicitud = 'INSERT INTO solicitudes (tipo_usuario, correo, estado, fecha_inicio, fecha_entrega, ubicacion_actual, id_equipo) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        connection.query(querySolicitud, ['profesor', 'itez@uv.mx', 'Pendiente', fechaInicio, fechaFin, ubicacion, idEquipo], (err, result) => {
+        const querySolicitud = 'INSERT INTO solicitudes (tipo_usuario, estado, fecha_inicio, fecha_entrega, ubicacion_actual, id_equipo) VALUES (?, ?, ?, ?, ?, ?)';
+        connection.query(querySolicitud, [tipo_usuario, 'Pendiente', fechaInicio, fechaFin, ubicacion, idEquipo], (err, result) => {
             if (err) {
                 console.error('Error al registrar la solicitud:', err);
-                res.send('Hubo un error al registrar la solicitud.');
+                res.status(500).send('Hubo un error al registrar la solicitud.');
             } else {
-                console.log('Solicitud registrada con éxito');
-                res.send('Solicitud enviada correctamente.');
+                res.json({ message: 'Solicitud enviada correctamente.' });
             }
         });
     });
 });
+
 
 
 // Ruta para validar credenciales de inicio de sesión

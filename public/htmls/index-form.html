@@ -1,45 +1,46 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="../css/index-form-style.css">
-        <title>Formularios</title>
-    </head>
-    <body>
-        <div class="form-container">
-            <h2>¿Quien solicita prestamo?</h2>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/index-form-style.css">
+    <title>Formularios</title>
+</head>
+<body>
+    <div class="form-container">
+        <h2>¿Quién solicita préstamo?</h2>
+        
+        <div class="button-container">
+            <button class="user-button" data-role="teacher" onclick="setUserRole('profesor')">
+                <div class="user-icon-container">
+                    <img class="user-icon" src="../img/image-form/profesor.png">
+                </div>
+                <p class="label-button">Soy Profesor</p>
+            </button>
             
-            <!-- Botones para elegir tipo de usuario -->
-            <div class="button-container">
-
-                <!-- Boton del usuario tipo profesor-->
-                <button  class="user-button" id="profesor-button">
-                    <div class="user-icon-container">
-                        <img class="user-icon" src="../img/image-form/profesor.png">
-                    </div>
-                    <p class="label-button">Soy Profesor</p>
-                </button>
-
-                <!-- Boton del usuario tipo estudiante-->
-                <button  class="user-button" id="student-button">
-                    <div class="user-icon-container">
-                        <img class="admin-icon" src="../img/image-form/student.png">
-                    </div>
-                    <p class="label-button">Soy Estudiante</p>
-                </button>
-                
-                
-                <!-- Boton de administrador -->
-                <button  class="admin-button" id="admin-button">
-                    <div class="admin-icon-container">
-                        <img class="admin-icon" src="admin.png">
-                    </div>
-                    <p class="label-admin">Tecnico Academico</p>
-                </button>
-
-            </div>
-    
+            <button class="user-button" data-role="student" onclick="setUserRole('student')">
+                <div class="user-icon-container">
+                    <img class="user-icon" src="../img/image-form/student.png">
+                </div>
+                <p class="label-button">Soy Estudiante</p>
+            </button>
+            
+            <button class="admin-button" data-role="tecnico" onclick="setUserRolero('tecnico')" >
+                <div class="admin-icon-container">
+                    <img class="admin-icon" src="../img/image-form/tecnico.png">
+                </div>
+                <p class="label-admin">Técnico Académico</p>
+            </button>
         </div>
-    </body>
+    </div>
+
+    <script>
+        document.querySelectorAll('.user-button, .admin-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const role = this.getAttribute('data-role');
+                window.location.href = `/formularios/${role}`;
+            });
+        });
+    </script>
+</body>
 </html>

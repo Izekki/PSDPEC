@@ -11,7 +11,7 @@ router.get('/teacher', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/htmls/form-teacher.html'));
 });
  
-router.get('/login', (req, res) => {
+router.get('/tecnico', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/htmls/login.html'));
 })
 
@@ -19,5 +19,8 @@ router.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/htmls/admin-view.html'));
 });
 
+router.get('/selectUser',(req,res) => {
+    res.sendFile(path.join(__dirname, '../public/htmls/index-form.html'));
+})
 
 module.exports = router;
