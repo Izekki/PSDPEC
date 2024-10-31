@@ -30,10 +30,11 @@ router.post('/login', (req, res) => {
 
 // Ruta para enviar solicitudes
 router.post('/enviar-solicitud', (req, res) => {
-    const { matricula, equipo, ubicacion, 'fecha-inicio': fechaInicio, 'fecha-fin': fechaFin, tipo_usuario } = req.body;
+    //console.log(req.body)
+    const { matricula, equipo, ubicacion, 'fecha_inicio': fechaInicio, 'fecha_fin': fechaFin, tipo_usuario } = req.body;
 
     // Validar el tipo de usuario
-    if (!['teacher', 'student', 'tecnico'].includes(tipo_usuario)) {
+    if (!['profesor', 'estudiante',].includes(tipo_usuario)) {
         return res.status(400).json({ error: 'Tipo de usuario inválido' });
     }
 
@@ -52,15 +53,19 @@ router.post('/enviar-solicitud', (req, res) => {
         }
 
         const idEquipo = results[0].id_equipo;
-
+       // console.log('Id del equipo encontrado:',idEquipo)
+       // console.log('Fecha de inicio antes del query:',fechaInicio)
+        
         // Insertar la solicitud en la tabla "solicitudes"
         const querySolicitud = 'INSERT INTO solicitudes (tipo_usuario, estado, fecha_inicio, fecha_entrega, ubicacion_actual, id_equipo) VALUES (?, ?, ?, ?, ?, ?)';
         connection.query(querySolicitud, [tipo_usuario, 'Pendiente', fechaInicio, fechaFin, ubicacion, idEquipo], (err, result) => {
             if (err) {
+                //console.log('Query insert solicitudes valor de fecha Inicio:',fechaInicio)
                 console.error('Error al registrar la solicitud:', err);
                 res.status(500).send('Hubo un error al registrar la solicitud.');
             } else {
                 res.json({ message: 'Solicitud enviada correctamente.' });
+                
             }
         });
     });

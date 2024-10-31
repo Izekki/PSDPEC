@@ -3,33 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario</title>
+    <title>Formulario Estudiante</title>
     <link rel="stylesheet" href="../css/form-style.css">
 </head>
 <body>
     <div class="form-container">
-        <form action="/public/htmls/form.html" method="">\
+        <form class="form-user-request">
             <h1>Solicitud de Préstamos de Computo</h1>
             <h2>Estudiante</h2>
-            <label for="matricula">Matricula:</label>
+            <label for="matricula">Matrícula:</label>
             <input type="text" name="matricula" id="matricula" required>
+
             <label for="tipo-equipo">Tipo de equipo:</label>
             <select name="equipo" id="equipo" required>
                 <option value="" disabled selected hidden>-- Selecciona un tipo --</option>
                 <option value="laptop">Laptop</option>
-                <option value="pc">Pc</option>
+                <option value="pc">PC</option>
             </select>            
-            <label for="ubicacion">Ubicación:</label>
-                <input type="text" id="ubicacion" name="ubicacion" required>
-    
-                <label for="fecha-inicio">Fecha de inicio:</label>
-                <input type="date" id="fecha-inicio" name="fecha-inicio" required>
-    
-                <label for="fecha-fin">Fecha de fin:</label>
-                <input type="date" id="fecha-fin" name="fecha-fin" required>
 
-                <button type="submit">Enviar</button>
+            <label for="ubicacion">Ubicación:</label>
+            <input type="text" id="ubicacion" name="ubicacion" required>
+
+            <label for="fecha-inicio">Fecha de inicio:</label>
+            <input type="date" id="fecha-inicio" name="fecha-inicio" required>
+
+            <label for="fecha-fin">Fecha de fin:</label>
+            <input type="date" id="fecha-fin" name="fecha-fin" required>
+
+            <div id="error-message" style="color: red;"></div>
+            <button type="submit">Enviar</button>
         </form>
     </div>
+
+    <script src="/js/form-index.js"></script>
 </body>
 </html>

@@ -3,6 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStatistics();
 });
 
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', options); // Cambia 'es-ES' según el idioma deseado
+}
+
 function loadRequests() {
     console.log('Cargando solicitudes...');
     fetch('/solicitudes/listar')
@@ -18,8 +24,8 @@ function loadRequests() {
                     <td>${request.tipo_usuario}</td>
                     <td>${request.correo || 'No especificado'}</td>
                     <td>${request.ubicacion_actual || 'No especificado'}</td>
-                    <td>${request.fecha_inicio}</td>
-                    <td>${request.fecha_entrega}</td>
+                    <td>${formatDate(request.fecha_inicio)}</td>
+                    <td>${formatDate(request.fecha_entrega)}</td>
                     <td>${request.estado}</td>
                     <td>${request.nombre_equipo || 'No especificado'}</td>
                     <td>
@@ -33,6 +39,8 @@ function loadRequests() {
         })
         .catch(error => console.error('Error al cargar solicitudes:', error));
 }
+
+
 
 function loadStatistics() {
     fetch('/solicitudes/estadisticas')

@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const role = urlParams.get('role'); 
+    console.log(role)
 
-    document.querySelector('.form-teacher').addEventListener('submit', function (event) {
+    document.querySelector('.form-user-request').addEventListener('submit', function (event) {
         event.preventDefault();
 
         const formData = new FormData(this);
@@ -14,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
             fecha_fin: formData.get('fecha-fin'),
             tipo_usuario: role
         };
+        console.log(data)
 
         fetch('/solicitudes/enviar-solicitud', {
             method: 'POST',
@@ -22,10 +24,12 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(result => {
+            console.log(result)
             if (result.error) {
                 document.getElementById('error-message').textContent = `Error: ${result.error}`;
             } else {
-                alert(result.message);
+                if(confirm(result.message))
+                    window.location.href = '/formularios/selectUser';
             }
         })
         .catch(error => {

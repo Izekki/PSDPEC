@@ -13,35 +13,35 @@
         <div class="button-container">
             <button class="user-button" data-role="profesor">
                 <div class="user-icon-container">
-                    <img class="user-icon" src="../img/image-form/profesor.png">
+                    <img class="user-icon" src="/img/image-form/profesor.png">
                 </div>
                 <p class="label-button">Soy Profesor</p>
             </button>
             
             <button class="user-button" data-role="estudiante">
                 <div class="user-icon-container">
-                    <img class="user-icon" src="../img/image-form/student.png">
+                    <img class="user-icon" src="/img/image-form/student.png">
                 </div>
                 <p class="label-button">Soy Estudiante</p>
             </button>
             
             <button class="admin-button" data-role="tecnico">
                 <div class="admin-icon-container">
-                    <img class="admin-icon" src="../img/image-form/tecnico.png">
+                    <img class="admin-icon" src="/img/image-form/admin.png">
                 </div>
                 <p class="label-admin">Técnico Académico</p>
             </button>
         </div>
     </div>
-
+    <!--/${role}`-->
     <script>
         document.querySelectorAll('.user-button, .admin-button').forEach(button => {
             button.addEventListener('click', function () {
                 const role = this.getAttribute('data-role');
-                window.location.href = `/formularios/${role}`;
+                window.location.href = `/formularios/${role}?role=${role}`;
             });
         });
     </script>
-    <script src="/public/js/form-index.js"></script>
+    <script src="/js/form-index.js"></script>
 </body>
 </html>
