@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración - Solicitudes de Préstamo</title>
+    <link rel="stylesheet" href="/css/admin-view.css">
 </head>
 <body>
     <header>
@@ -15,7 +16,6 @@
         <section class="statistics">
             <h2>Estadísticas Generales</h2>
             <div id="stats-container">
-                <!-- Aquí se cargarán las estadísticas usando JavaScript -->
             </div>
         </section>
 
@@ -37,10 +37,15 @@
                     </tr>
                 </thead>
                 <tbody id="request-table-body">
-                    <!-- Las solicitudes se cargarán aquí con JavaScript -->
                 </tbody>
             </table>
         </section>
+        <button onclick="history.back()" class="btn-back">
+            <div class="div-btn-back">
+                <img class="btn-icon-back" src="/img/image-form/flecha-regresar.ico">
+            </div>
+        </button>
+
     </main>
 
     <footer>
