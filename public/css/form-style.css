@@ -42,7 +42,7 @@ label {
     margin-bottom:10px;
 }
 
-input[type="text"], input[type="date"], select {
+input[type="text"], input[type="datetime-local"], select {
     padding: 8px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
@@ -50,7 +50,7 @@ input[type="text"], input[type="date"], select {
     font-size: 14px;
 }
 
-input[type="text"]:hover, input[type="date"]:hover, select:hover {
+input[type="text"]:hover, input[type="datetime-local"]:hover, select:hover {
     border: 1px solid #218c45;
     color: #18529d;
     
