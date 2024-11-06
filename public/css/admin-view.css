@@ -103,6 +103,8 @@ footer{
     margin-top: 5%;
     height: 10%;
     background-color: #218c45;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
 }
 .footer-Uv{
     padding: 10px;
