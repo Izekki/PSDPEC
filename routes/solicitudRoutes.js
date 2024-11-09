@@ -3,6 +3,7 @@ const router = express.Router();
 const connection = require('../db/connection');
 
 
+
 // Ruta para validar credenciales de inicio de sesión
 router.post('/login', (req, res) => {
     const { correo, contrasenia } = req.body;
@@ -13,20 +14,18 @@ router.post('/login', (req, res) => {
     connection.query(query, [correo, contrasenia], (err, results) => {
         if (err) {
             console.error('Error al verificar las credenciales:', err);
-            res.status(500).send('Error en el servidor');
-            return;
+            return res.status(500).json({ success: false, message: 'Error en el servidor' });
         }
 
         if (results.length > 0) {
-            // Redirigir al usuario a una página de éxito (reemplaza 'pagina-de-exito.html' con la página final)
-            res.redirect('/formularios/admin');
+            // Credenciales correctas
+            return res.json({ success: true, redirectUrl: '/formularios/admin' });
         } else {
             // Credenciales incorrectas
-            res.status(401).send('Credenciales incorrectas');
+            return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
         }
     });
 });
-
 
 // Ruta para enviar solicitudes
 router.post('/enviar-solicitud', (req, res) => {
