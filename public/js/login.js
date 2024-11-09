@@ -26,3 +26,8 @@ document.getElementById('login-button').addEventListener('click', async () => {
         errorMessage.style.display = 'block';
     }
 });
+
+
+function userBack(){
+    window.location.href = '/formularios/selectUser';
+}
