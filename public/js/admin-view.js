@@ -88,3 +88,21 @@ function deleteRequest(id) {
         .then(data => loadRequests())
         .catch(error => console.error('Error al eliminar solicitud:', error));
 }
+
+function logout() {
+    fetch('/solicitudes/logout', {
+        method: 'POST',
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.href = '/formularios/tecnico';
+        } else {
+            alert('Error al cerrar sesión. Inténtalo de nuevo.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al cerrar sesión:', error);
+        alert('Ocurrió un error al cerrar sesión.');
+    });
+}
