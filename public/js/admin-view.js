@@ -6,40 +6,17 @@ document.addEventListener('DOMContentLoaded', () => {
 function formatDate(dateString) {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', options); // Cambia 'es-ES' según el idioma deseado
+    return date.toLocaleDateString('es-ES', options);
 }
 
-function loadRequests() {
+function loadRequests() { // TODAS LAS SOLICITUDES
     console.log('Cargando solicitudes...');
     fetch('/solicitudes/listar')
         .then(response => response.json())
         .then(data => {
-            const tableBody = document.getElementById('request-table-body');
-            tableBody.innerHTML = '';
-
-            data.forEach(request => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${request.id_solicitud}</td>
-                    <td>${request.tipo_usuario}</td>
-                    <td>${request.correo || 'No especificado'}</td>
-                    <td>${request.ubicacion_actual || 'No especificado'}</td>
-                    <td>${formatDate(request.fecha_inicio)}</td>
-                    <td>${formatDate(request.fecha_entrega)}</td>
-                    <td>${request.estado}</td>
-                    <td>${request.nombre_equipo || 'No especificado'}</td>
-                    <td>
-                        <button onclick="approveRequest(${request.id_solicitud})">Aceptar</button>
-                        <button onclick="rejectRequest(${request.id_solicitud})">Rechazar</button>
-                        <button onclick="deleteRequest(${request.id_solicitud})">Eliminar</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
+            mostrarSolicitudes(data);
             });
-        })
-        .catch(error => console.error('Error al cargar solicitudes:', error));
-}
-
+        }
 
 
 function loadStatistics() {
@@ -104,5 +81,58 @@ function logout() {
     .catch(error => {
         console.error('Error al cerrar sesión:', error);
         alert('Ocurrió un error al cerrar sesión.');
+    });
+}
+
+function filtrar(){
+    const tipoUsuario = document.getElementById('filtroTipoUsuario').value;
+    const estado = document.getElementById('filtroEstado').value;
+    const fechaInicio = document.getElementById('filtroFechaInicio').value;
+
+    obtenerSolicitudesFiltradas(tipoUsuario, estado, fechaInicio);
+    console.log(tipoUsuario, estado, fechaInicio);
+}
+
+
+function obtenerSolicitudesFiltradas(tipoUsuario, estado, fechaInicio) {
+    const queryParams = new URLSearchParams({
+        tipo_usuario: tipoUsuario,
+        estado: estado,
+        fecha_inicio: fechaInicio
+    });
+    console.log(queryParams.toString())
+
+    fetch(`/solicitudes/listar-filtradas?${queryParams}`)
+        .then(response => response.json())
+        .then(data => {
+            mostrarSolicitudes(data);
+        })
+        .catch(error => {
+            console.error('Error al obtener solicitudes filtradas:', error);
+        });
+}
+
+function mostrarSolicitudes(data) {
+    const tableBody = document.getElementById('request-table-body');
+            tableBody.innerHTML = '';
+
+            data.forEach(request => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${request.id_solicitud}</td>
+                    <td>${request.tipo_usuario}</td>
+                    <td>${request.correo || 'No especificado'}</td>
+                    <td>${request.ubicacion_actual || 'No especificado'}</td>
+                    <td>${formatDate(request.fecha_inicio)}</td>
+                    <td>${formatDate(request.fecha_entrega)}</td>
+                    <td>${request.estado}</td>
+                    <td>${request.nombre_equipo || 'No especificado'}</td>
+                    <td>
+                        <button onclick="approveRequest(${request.id_solicitud})">Aceptar</button>
+                        <button onclick="rejectRequest(${request.id_solicitud})">Rechazar</button>
+                        <button onclick="deleteRequest(${request.id_solicitud})">Eliminar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
     });
 }
