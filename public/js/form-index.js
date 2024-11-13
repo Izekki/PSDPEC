@@ -38,3 +38,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+
+function userBack(){
+    window.location.href = '/formularios/selectUser';
+}
+

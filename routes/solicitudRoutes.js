@@ -1,29 +1,44 @@
 const express = require('express');
 const router = express.Router();
 const connection = require('../db/connection');
+const session = require('express-session');
 
+// Configura express-session
+router.use(session({
+    secret: 'tu_clave_secreta',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
 
-// Ruta para validar credenciales de inicio de sesión
+// Ruta de inicio de sesión
 router.post('/login', (req, res) => {
     const { correo, contrasenia } = req.body;
-    
-    // Consulta para verificar las credenciales en la tabla 'administradores'
     const query = 'SELECT * FROM administradores WHERE correo = ? AND contrasenia = ?';
 
     connection.query(query, [correo, contrasenia], (err, results) => {
         if (err) {
             console.error('Error al verificar las credenciales:', err);
-            res.status(500).send('Error en el servidor');
-            return;
+            return res.status(500).json({ success: false, message: 'Error en el servidor' });
         }
 
         if (results.length > 0) {
-            // Redirigir al usuario a una página de éxito (reemplaza 'pagina-de-exito.html' con la página final)
-            res.redirect('/formularios/admin');
+            req.session.userId = results[0].id; // Guarda el ID del usuario en la sesión
+            return res.json({ success: true, redirectUrl: '/formularios/admin' });
         } else {
-            // Credenciales incorrectas
-            res.status(401).send('Credenciales incorrectas');
+            return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
         }
+    });
+});
+
+// Ruta para cerrar sesión (logout)
+router.post('/logout', (req, res) => {
+    console.log(req)
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Error al cerrar sesión' });
+        }
+        res.json({ success: true, message: 'Sesión cerrada exitosamente' });
     });
 });
 
