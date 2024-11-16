@@ -89,13 +89,14 @@ router.post('/enviar-solicitud', (req, res) => {
 
 
 
-// Listar todas las solicitudes de préstamo con el nombre del equipo
-router.get('/listar', (req, res) => {
+//Ruta para listar las solicitudes
+router.get('/listar-solicitudes', (req, res) => {
     const query = `
         SELECT s.id_solicitud, s.tipo_usuario, s.correo, s.estado, 
                s.fecha_inicio, s.fecha_entrega, s.ubicacion_actual,
                (SELECT e.tipo_equipo FROM equipos e WHERE e.id_equipo = s.id_equipo) AS nombre_equipo
         FROM solicitudes s
+        WHERE s.estado = 'Pendiente'
     `;
 
     connection.query(query, (err, results) => {
@@ -108,6 +109,27 @@ router.get('/listar', (req, res) => {
         }
     });
 });
+// Ruta para listar los prestamos
+router.get('/listar-prestamos',(req,res ) => {
+    const query = `
+        SELECT p.id_prestamo, e.tipo_equipo, p.id_solicitud, p.fecha_entrega, p.fecha_devolucion, p.estado_prestamo 
+        FROM prestamos AS p
+        INNER JOIN solicitudes AS s ON p.id_solicitud = s.id_solicitud
+        INNER JOIN equipos AS e ON s.id_equipo = e.id_equipo
+        WHERE estado_prestamo = 'No entregado'
+    `;
+    connection.query(query,(err,results) => {
+        if (err) {
+            console.error('Error al listar prestamos:', err);
+            res.status(500).json({ error: 'Error al obtener los prestamos' });
+        } else {
+            console.log('Resultados de la consulta:', results); // Para depuración
+            res.json(results);
+        }
+    })
+})
+
+
 
 // Ruta para obtener solicitudes filtradas
 router.get('/listar-filtradas', (req, res) => {

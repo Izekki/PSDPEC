@@ -3,21 +3,74 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStatistics();
 });
 
+
+
+function updateTableTitleAndHeader(type) {
+    const title = document.getElementById('table-title');
+    const header = document.getElementById('table-header');
+
+    if (type === 'solicitudes') {
+        title.textContent = 'Lista de Solicitudes';
+        header.innerHTML = `
+            <th>ID Solicitud</th>
+            <th>Tipo Usuario</th>
+            <th>Correo</th>
+            <th>Ubicación Actual</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Entrega</th>
+            <th>Estado</th>
+            <th>Equipo</th>
+            <th>Acciones</th>
+        `;
+    } else if (type === 'prestamos') {
+        title.textContent = 'Lista de Préstamos';
+        header.innerHTML = `
+            <th>ID Préstamo</th>
+            <th>Tipo Equipo</th>
+            <th>ID Solicitud</th>
+            <th>Fecha Entrega</th>
+            <th>Fecha Devolución</th>
+            <th>Estado</th>
+        `;
+    }
+}
+
 function formatDate(dateString) {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', options);
 }
 
-function loadRequests() { // TODAS LAS SOLICITUDES
+function loadRequests() {
     console.log('Cargando solicitudes...');
-    fetch('/solicitudes/listar')
+    fetch('/solicitudes/listar-solicitudes')
         .then(response => response.json())
         .then(data => {
-            mostrarSolicitudes(data);
+            mostrarDatos(data,"solicitudes");
             });
         }
 
+function listarSolicitudes(){
+    updateTableTitleAndHeader('solicitudes');
+    loadRequests();
+}
+
+function loadPrestamos() {
+    console.log('Cargando préstamos...');
+    fetch('/solicitudes/listar-prestamos')
+        .then(response => response.json())
+        .then(data => {
+            mostrarDatos(data, 'prestamos'); 
+        })
+        .catch(error => {
+            console.error('Error al cargar préstamos:', error);
+        });
+}
+
+function listarPrestamos(){
+    updateTableTitleAndHeader('prestamos');
+    loadPrestamos();
+}
 
 function loadStatistics() {
     fetch('/solicitudes/estadisticas')
@@ -93,7 +146,6 @@ function filtrar(){
     console.log(tipoUsuario, estado, fechaInicio);
 }
 
-
 function obtenerSolicitudesFiltradas(tipoUsuario, estado, fechaInicio) {
     const queryParams = new URLSearchParams({
         tipo_usuario: tipoUsuario,
@@ -105,34 +157,48 @@ function obtenerSolicitudesFiltradas(tipoUsuario, estado, fechaInicio) {
     fetch(`/solicitudes/listar-filtradas?${queryParams}`)
         .then(response => response.json())
         .then(data => {
-            mostrarSolicitudes(data);
+            mostrarDatos(data, 'solicitudes');
         })
         .catch(error => {
             console.error('Error al obtener solicitudes filtradas:', error);
         });
 }
 
-function mostrarSolicitudes(data) {
+function mostrarDatos(data, type) {
     const tableBody = document.getElementById('request-table-body');
-            tableBody.innerHTML = '';
-
-            data.forEach(request => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${request.id_solicitud}</td>
-                    <td>${request.tipo_usuario}</td>
-                    <td>${request.correo || 'No especificado'}</td>
-                    <td>${request.ubicacion_actual || 'No especificado'}</td>
-                    <td>${formatDate(request.fecha_inicio)}</td>
-                    <td>${formatDate(request.fecha_entrega)}</td>
-                    <td>${request.estado}</td>
-                    <td>${request.nombre_equipo || 'No especificado'}</td>
-                    <td>
-                        <button onclick="approveRequest(${request.id_solicitud})">Aceptar</button>
-                        <button onclick="rejectRequest(${request.id_solicitud})">Rechazar</button>
-                        <button onclick="deleteRequest(${request.id_solicitud})">Eliminar</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-    });
+    tableBody.innerHTML = '';
+    if (type === 'solicitudes') {
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.id_solicitud}</td>
+                <td>${item.tipo_usuario}</td>
+                <td>${item.correo || 'No especificado'}</td>
+                <td>${item.ubicacion_actual || 'No especificado'}</td>
+                <td>${formatDate(item.fecha_inicio)}</td>
+                <td>${formatDate(item.fecha_entrega)}</td>
+                <td>${item.estado}</td>
+                <td>${item.nombre_equipo || 'No especificado'}</td>
+                <td>
+                    <button onclick="approveRequest(${item.id_solicitud})">Aceptar</button>
+                    <button onclick="rejectRequest(${item.id_solicitud})">Rechazar</button>
+                    <button onclick="deleteRequest(${item.id_solicitud})">Eliminar</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } else if (type === 'prestamos') {
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.id_prestamo}</td>
+                <td>${item.tipo_equipo}</td>
+                <td>${item.id_solicitud}</td>
+                <td>${formatDate(item.fecha_entrega)}</td>
+                <td>${formatDate(item.fecha_devolucion)}</td>
+                <td>${item.estado_prestamo}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
 }

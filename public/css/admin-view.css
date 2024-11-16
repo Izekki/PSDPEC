@@ -139,3 +139,97 @@ footer{
 .copy-uv{
     color: #fff;
 }
+
+/*TODO ESTO SE AGREGO*/
+/* Estilo para el título de filtros */
+.title-filters {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px; /* Separación de los filtros de las secciones */
+}
+
+/* Sección de filtros */
+.filters {
+    display: flex;
+    flex-direction: column; /* Asegura que las secciones estén apiladas verticalmente */
+    justify-content: flex-start;
+    gap: 20px; /* Espacio entre la palabra "Filtros" y las secciones de filtro */
+}
+
+/* Contenedor de filtros y botones */
+.filter-options {
+    display: flex;
+    width: 100%;
+    justify-content: space-between; /* Distribuye el espacio entre la izquierda y la derecha */
+    gap: 20px; /* Espacio entre los elementos de filtro */
+}
+
+/* Sección de filtros (izquierda) */
+.left-section, .right-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.left-section {
+    flex: 1; /* Toma el 50% del espacio disponible */
+}
+
+.right-section {
+    width: 200px; /* Controla el ancho de los botones */
+    align-items: flex-end; /* Alinea los botones a la derecha */
+    flex-shrink: 0; /* Evita que esta columna se reduzca de tamaño */
+}
+
+/* Estilos de etiquetas y campos de formulario */
+.left-section label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.left-section select, .left-section input {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 100%; /* Los campos de entrada ocuparán todo el ancho disponible */
+}
+
+/* Estilo de los botones */
+.right-section button {
+    padding: 12px 20px; /* Añadir padding para hacer los botones más grandes */
+    background-color: #218c45;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%; /* Los botones ocupan todo el ancho de la columna */
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.right-section button:hover {
+    background-color: #1e7e34;
+}
+
+/* El primer botón no tiene margen superior */
+.right-section button:first-child {
+    margin-top: 0;
+}
+
+/* Estilos de los títulos */
+h2, h3 {
+    margin-bottom: 15px;
+}
+
+h3 {
+    margin-top: 0;
+}
+
+.subtitle {
+    text-align: right; /* Alinea los subtítulos a la derecha */
+    margin-bottom: 10px; 
+    font-size: 16px; 
+    font-weight: normal;
+}
