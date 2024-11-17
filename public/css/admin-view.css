@@ -1,170 +1,160 @@
-/*E S T I L O T A B L A*/
+/* E S T I L O T A B L A */
 body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
-    display:flow-root;
+    display: flow-root;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
     padding: 0;
 }
-section{
+
+section {
     margin: 20px;
     padding: 15px;
 }
-header{
-    padding:0px 20px;
+
+header {
+    padding: 0px 20px;
     background-color: #218c45;
     display: flex;
     color: #fff;
-    
 }
-.div-logo-title{
+
+.div-logo-title {
     display: flex;
-    flex-wrap:nowrap;
+    flex-wrap: nowrap;
     align-content: flex-start;
 }
 
-.img-logo-uv{
+.img-logo-uv {
     width: 100px;
     height: 100px;
     margin: 10px;
     flex-grow: 1;
-
 }
-.title-header{
+
+.title-header {
     text-align: center;
     align-self: center;
     padding: 10px;
     flex-grow: 1;
-
 }
 
-.statistics, .request-list, .filters{
+.statistics, .request-list, .filters {
     background-color: white;
     padding: 15px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-
 }
 
-table button{
+table button {
     margin: 1px;
     padding: 5px;
     width: 100%;
 }
 
 section table {
-    width: 100%; /* Ajusta el ancho de la tabla */
-    border-collapse: collapse; /* Colapsa los bordes */
-    background-color: white; /* Fondo blanco */
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
 }
 
 th, td {
-    padding: 10px; /* Espaciado interno en las celdas */
-    text-align: left; /* Alineación del texto */
+    padding: 10px;
+    text-align: left;
 }
 
 tr {
-    border-bottom: 1px solid #ddd; /* Línea divisoria entre filas */
+    border-bottom: 1px solid #ddd;
 }
 
-/* Elimina el borde inferior de la última fila */
 tr:last-child {
     border-bottom: none;
 }
 
 td {
-    border-right: 1px solid transparent; /* Borde invisible para mantener separación */
+    border-right: 1px solid transparent;
 }
 
-/* Para eliminar el borde derecho de la última columna */
 td:last-child {
     border-right: none;
 }
-/*E S T I L O B O T O N*/
-.btn-back{
+
+/* E S T I L O B O T O N */
+.btn-back {
     background-color: #ffffff;
     border-radius: 10px;
-    box-shadow: 4px 4px 15px -4px rgba(0,0,0,0.3);
-
+    box-shadow: 4px 4px 15px -4px rgba(0, 0, 0, 0.3);
     border: none;
     padding: 10px;
     width: 100px;
     height: 40px;
-
     position: absolute;
     top: 20px;
     right: 20px;
-
     display: flex;
     cursor: pointer;
-
     color: #000;
     transition: transform 0.7s;
     flex-grow: 1;
-
 }
 
-.btn-back:hover{
+.btn-back:hover {
     background-color: #cecece;
     transform: scale(1.02);
 }
 
-.div-btn-back{
+.div-btn-back {
     width: 100%;
     height: 100%;
     flex-grow: 1;
-
 }
 
-.btn-icon-back{
+.btn-icon-back {
     width: 100%;
     height: 100%;
     object-fit: contain;
 }
 
 /* F O O T E R */
-footer{
+footer {
     margin-top: 5%;
     height: 10%;
     background-color: #218c45;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-
 }
-.footer-Uv{
+
+.footer-Uv {
     padding: 10px;
 }
 
-.copy-uv{
+.copy-uv {
     color: #fff;
 }
 
-/*TODO ESTO SE AGREGO*/
-/* Estilo para el título de filtros */
+/* Título de filtros */
 .title-filters {
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 20px; /* Separación de los filtros de las secciones */
+    margin-bottom: 20px;
 }
 
-/* Sección de filtros */
 .filters {
     display: flex;
-    flex-direction: column; /* Asegura que las secciones estén apiladas verticalmente */
+    flex-direction: column;
     justify-content: flex-start;
-    gap: 20px; /* Espacio entre la palabra "Filtros" y las secciones de filtro */
+    gap: 20px;
 }
 
-/* Contenedor de filtros y botones */
 .filter-options {
     display: flex;
     width: 100%;
-    justify-content: space-between; /* Distribuye el espacio entre la izquierda y la derecha */
-    gap: 20px; /* Espacio entre los elementos de filtro */
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
 }
 
-/* Sección de filtros (izquierda) */
 .left-section, .right-section {
     display: flex;
     flex-direction: column;
@@ -172,13 +162,15 @@ footer{
 }
 
 .left-section {
-    flex: 1; /* Toma el 50% del espacio disponible */
+    flex: 1;
+    width: 45%;
 }
 
 .right-section {
-    width: 200px; /* Controla el ancho de los botones */
-    align-items: flex-end; /* Alinea los botones a la derecha */
-    flex-shrink: 0; /* Evita que esta columna se reduzca de tamaño */
+    flex: 1;
+    width: 45px;
+    align-items: flex-start;
+    flex-shrink: 0;
 }
 
 /* Estilos de etiquetas y campos de formulario */
@@ -192,33 +184,17 @@ footer{
     border-radius: 5px;
     border: 1px solid #ccc;
     font-size: 14px;
-    width: 100%; /* Los campos de entrada ocuparán todo el ancho disponible */
-}
-
-/* Estilo de los botones */
-.right-section button {
-    padding: 12px 20px; /* Añadir padding para hacer los botones más grandes */
-    background-color: #218c45;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    width: 100%; /* Los botones ocupan todo el ancho de la columna */
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
+    width: 100%;
 }
 
 .right-section button:hover {
     background-color: #1e7e34;
 }
 
-/* El primer botón no tiene margen superior */
 .right-section button:first-child {
     margin-top: 0;
 }
 
-/* Estilos de los títulos */
 h2, h3 {
     margin-bottom: 15px;
 }
@@ -228,8 +204,39 @@ h3 {
 }
 
 .subtitle {
-    text-align: right; /* Alinea los subtítulos a la derecha */
-    margin-bottom: 10px; 
-    font-size: 16px; 
+    text-align: right;
+    margin-bottom: 10px;
+    font-size: 16px;
     font-weight: normal;
+}
+
+.left-section select,
+.left-section input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Estilo de los botones de las secciones izquierda, derecha y acciones */
+.btn-general {
+    padding: 12px 20px;
+    background-color: #218c45;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-general:hover {
+    background-color: #1e7e34;
+    transform: translateY(-2px); /* Resalta ligeramente el botón */
 }

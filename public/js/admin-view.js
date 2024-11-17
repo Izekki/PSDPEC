@@ -31,6 +31,8 @@ function updateTableTitleAndHeader(type) {
             <th>Fecha Entrega</th>
             <th>Fecha Devolución</th>
             <th>Estado</th>
+            <th>Acciones</th>
+
         `;
     }
 }
@@ -180,9 +182,9 @@ function mostrarDatos(data, type) {
                 <td>${item.estado}</td>
                 <td>${item.nombre_equipo || 'No especificado'}</td>
                 <td>
-                    <button onclick="approveRequest(${item.id_solicitud})">Aceptar</button>
-                    <button onclick="rejectRequest(${item.id_solicitud})">Rechazar</button>
-                    <button onclick="deleteRequest(${item.id_solicitud})">Eliminar</button>
+                    <button class ="btn-acciones btn-general" onclick="approveRequest(${item.id_solicitud})">Aceptar</button>
+                    <button class ="btn-acciones btn-general" onclick="rejectRequest(${item.id_solicitud})">Rechazar</button>
+                    <button class ="btn-acciones btn-general" onclick="deleteRequest(${item.id_solicitud})">Eliminar</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -197,6 +199,9 @@ function mostrarDatos(data, type) {
                 <td>${formatDate(item.fecha_entrega)}</td>
                 <td>${formatDate(item.fecha_devolucion)}</td>
                 <td>${item.estado_prestamo}</td>
+                <td>
+                    <button class ="btn-acciones btn-general" onclick="">Entregado</button>
+                </td>
             `;
             tableBody.appendChild(row);
         });
