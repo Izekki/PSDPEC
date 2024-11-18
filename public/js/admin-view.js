@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let tipoDeTabla = 'solicitudes';
+let deleteRequestId = null;
 
 function updateTableTitleAndHeader(type) {
     const title = document.getElementById('table-title');
@@ -138,7 +139,9 @@ function listarPrestamosHistorial() {
 
 
 function approveRequest(id) {
-    fetch(`/solicitudes/aprobar/${id}`, { method: 'POST' })
+    if(tipoDeTabla === 'solicitudes'){
+
+        fetch(`/solicitudes/aprobar/${id}`, { method: 'POST' })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -153,21 +156,80 @@ function approveRequest(id) {
             console.error('Error al aprobar solicitud:', error);
             alert('Ocurrió un error al aprobar la solicitud. Inténtalo de nuevo.');
         });
+    } else if(tipoDeTabla === 'prestamos'){
+        console.log(id)
+        fetch(`/solicitudes/entregado/${id}`, { method: 'POST' })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            loadRequests();
+        })
+        .catch(error => {
+            console.error('Error al aprobar solicitud:', error);
+            alert('Ocurrió un error al aprobar la solicitud. Inténtalo de nuevo.');
+        });
+    }
 }
 
 function rejectRequest(id) {
     fetch(`/solicitudes/rechazar/${id}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => loadRequests())
-        .catch(error => console.error('Error al rechazar solicitud:', error));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            loadRequests();
+        })
+        .catch(error => {
+            console.error('Error al rechazar solicitud:', error);
+            alert('Ocurrió un error al rechazar la solicitud. Inténtalo de nuevo.');
+        });
 }
 
-function deleteRequest(id) {
-    fetch(`/solicitudes/eliminar/${id}`, { method: 'DELETE' })
-        .then(response => response.json())
-        .then(data => loadRequests())
-        .catch(error => console.error('Error al eliminar solicitud:', error));
+
+function openDeleteModal(id) {
+    deleteRequestId = id;
+
+
+    const modal = document.getElementById('confirmationModal');
+    modal.style.display = 'block';
 }
+
+function closeDeleteModal() {
+    const modal = document.getElementById('confirmationModal');
+    modal.style.display = 'none';
+}
+
+function confirmDeleteRequest() {
+    if (deleteRequestId) {
+        fetch(`/solicitudes/eliminar/${deleteRequestId}`, { method: 'DELETE' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                loadRequests();
+                closeDeleteModal(); // Cerrar el modal después de eliminar
+            })
+            .catch(error => {
+                console.error('Error al eliminar solicitud:', error);
+                alert('Ocurrió un error al eliminar la solicitud. Inténtalo de nuevo.');
+                closeDeleteModal(); // Cerrar el modal si ocurre un error
+            });
+    }
+}
+
 
 function logout() {
     fetch('/solicitudes/logout', {
@@ -248,7 +310,7 @@ function mostrarDatos(data, type) {
                 <td>
                     <button class="btn-acciones btn-general" onclick="approveRequest(${item.id_solicitud})">Aceptar</button>
                     <button class="btn-acciones btn-general" onclick="rejectRequest(${item.id_solicitud})">Rechazar</button>
-                    <button class="btn-acciones btn-general" onclick="deleteRequest(${item.id_solicitud})">Eliminar</button>
+                    <button class="btn-acciones btn-general" onclick="openDeleteModal(${item.id_solicitud})">Eliminar</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -272,7 +334,7 @@ function mostrarDatos(data, type) {
                 <td>${formatDate(item.fecha_devolucion)}</td>
                 <td>${item.estado_prestamo}</td>
                 <td>
-                    <button class="btn-acciones btn-general" onclick="">Entregado</button>
+                    <button class="btn-acciones btn-general" onclick="approveRequest(${item.id_prestamo})">Entregado</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -285,7 +347,7 @@ function mostrarDatos(data, type) {
         historialButton.onclick = listarPrestamosHistorial; // Llamar a listarPrestamosHistorial al hacer clic
         historialButtonContainer.appendChild(historialButton);
 
-    }else if (type === 'historial-solicitudes') {
+    } else if (type === 'historial-solicitudes') {
         data.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -300,7 +362,7 @@ function mostrarDatos(data, type) {
             `;
             tableBody.appendChild(row);
         });
-    }else if (type === 'historial-prestamos') {
+    } else if (type === 'historial-prestamos') {
         data.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `

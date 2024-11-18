@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="/css/admin-view.css">
 </head>
 <body>
+
+        <!-- Modal de confirmación de eliminación -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h4>¿Estás seguro de eliminar esta solicitud?</h4>
+            <p>Esta acción no se puede deshacer.</p>
+            <div class="modal-footer">
+                <button id="confirmDelete" class="btn red" onclick="confirmDeleteRequest()">Eliminar</button>
+                <button id="cancelDelete" class="btn" onclick="closeDeleteModal()">Cancelar</button>
+            </div>
+        </div>
+        
+    </div>
+
     <header>
         <div class="div-header-content">
             <div class="div-logo-title">

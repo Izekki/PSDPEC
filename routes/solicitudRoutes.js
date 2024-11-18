@@ -236,6 +236,28 @@ router.delete('/eliminar/:id', (req, res) => {
     });
 });
 
+// Aprobar Entrega
+router.post('/entregado/:id', (req, res) => {
+    const { id } = req.params;
+
+    // Actualizamos el estado a "Aprobada"
+    const query = 'UPDATE prestamos SET estado_prestamo = "Entregado" WHERE id_prestamo = ?';
+    connection.query(query, [id], (err, result) => {
+        if (err) {
+            console.error('Error al aprobar entrega del equipo:', err);
+            return res.status(500).json({ error: 'Error al aprobar entregar equipo' });
+        }
+
+        // Comprobamos si se actualizó alguna fila
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Equipo no encontrado' });
+        }
+
+        // Mensaje de éxito
+        res.json({ message: 'Equipo Entregado' });
+    });
+});
+
 // Obtener estadísticas de solicitudes
 router.get('/estadisticas', (req, res) => {
     const query = `
