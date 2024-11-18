@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadRequests();
     loadStatistics();
+    updateTableTitleAndHeader('solicitudes');
 });
 
 
