@@ -141,19 +141,30 @@ router.get('/listar-prestamos', (req, res) => {
 // Ruta para obtener solicitudes filtradas
 router.get('/solicitudes-filtradas', (req, res) => {
     const { tipo_usuario, estado, fecha_inicio } = req.query;
-    let query = 'SELECT * FROM solicitudes WHERE 1=1';
+    let query = `
+        SELECT s.id_solicitud, s.tipo_usuario, s.correo, s.estado, 
+               s.fecha_inicio, s.fecha_entrega, s.ubicacion_actual,
+               (SELECT e.tipo_equipo FROM equipos e WHERE e.id_equipo = s.id_equipo) AS nombre_equipo
+        FROM solicitudes s
+        WHERE 1=1
+    `;
     
+    const params = [];
+
     if (tipo_usuario) {
-        query += ` AND tipo_usuario = ?`;
+        query += ` AND s.tipo_usuario = ?`;
+        params.push(tipo_usuario);
     }
     if (estado) {
-        query += ` AND estado = ?`;
+        query += ` AND s.estado = ?`;
+        params.push(estado);
     }
     if (fecha_inicio) {
-        query += ` AND fecha_inicio >= ?`;
+        query += ` AND s.fecha_inicio = ?`;
+        params.push(fecha_inicio);
     }
 
-    connection.query(query, [tipo_usuario, estado, fecha_inicio], (err, results) => {
+    connection.query(query, params, (err, results) => {
         if (err) {
             console.error('Error al obtener solicitudes filtradas:', err);
             return res.status(500).json({ error: 'Error en la base de datos' });
@@ -162,22 +173,35 @@ router.get('/solicitudes-filtradas', (req, res) => {
     });
 });
 
-// Ruta para obtener préstamos filtrados
+
 router.get('/prestamos-filtrados', (req, res) => {
-    const { tipo_usuario, estado, fecha_inicio } = req.query;
-    let query = 'SELECT * FROM prestamos WHERE 1=1';
+    const { tipo_equipo, estado_prestamo, fecha_entrega } = req.query;
+    let query = `
+        SELECT p.id_prestamo, e.tipo_equipo, p.id_solicitud, p.fecha_entrega, p.fecha_devolucion, p.estado_prestamo 
+        FROM prestamos AS p
+        INNER JOIN solicitudes AS s ON p.id_solicitud = s.id_solicitud
+        INNER JOIN equipos AS e ON s.id_equipo = e.id_equipo
+        WHERE 1=1
+    `;
 
-    if (tipo_usuario) {
-        query += ` AND tipo_usuario = ?`;
+    const params = [];
+
+    if (tipo_equipo) {
+        query += ` AND e.tipo_equipo = ?`;
+        params.push(tipo_equipo);
     }
-    if (estado) {
-        query += ` AND estado_prestamo = ?`;
+    if (estado_prestamo) {
+        query += ` AND p.estado_prestamo = ?`;
+        params.push(estado_prestamo);
     }
-    if (fecha_inicio) {
-        query += ` AND fecha_entrega >= ?`;
+    
+    if (fecha_entrega) {
+        // Filtrar solo por la fecha (sin la hora)
+        query += ` AND DATE(p.fecha_entrega) = ?`;
+        params.push(fecha_entrega);
     }
 
-    connection.query(query, [tipo_usuario, estado, fecha_inicio], (err, results) => {
+    connection.query(query, params, (err, results) => {
         if (err) {
             console.error('Error al obtener préstamos filtrados:', err);
             return res.status(500).json({ error: 'Error en la base de datos' });
@@ -185,6 +209,7 @@ router.get('/prestamos-filtrados', (req, res) => {
         res.json(results);
     });
 });
+
 
 // Aprobar una solicitud de préstamo
 router.post('/aprobar/:id', (req, res) => {

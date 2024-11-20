@@ -67,6 +67,19 @@ function formatDate(dateString) {
     return date.toLocaleDateString('es-ES', options);
 }
 
+function formatDateHours(dateString) {
+    const options = { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit'
+    };
+    const date = new Date(dateString);
+    return date.toLocaleString('es-ES', options); // Muestra fecha y hora
+}
+
 function loadData(endpoint, type) {
     console.log(`Cargando ${type}...`);
     fetch(endpoint)
@@ -136,6 +149,33 @@ function listarPrestamosHistorial() {
         })
         .catch(error => console.error('Error al cargar historial de préstamos:', error));
 }
+
+function listarFiltrosSolicitudes() {
+    // Oculta la sección de filtros de préstamos
+    document.getElementById('filters-prestamos').style.display = 'none';
+    
+    // Muestra la sección de filtros de solicitudes
+    document.getElementById('filters-solicitudes').style.display = 'block';
+
+    // Limpiar los filtros de solicitudes
+    document.getElementById('filtroTipoUsuario').value = '';  // Limpiar el select
+    document.getElementById('filtroEstado').value = '';  // Limpiar el select
+    document.getElementById('filtroFechaInicio').value = '';  // Limpiar el input de fecha
+}
+
+function listarFiltrosPrestamos() {
+    // Oculta la sección de filtros de solicitudes
+    document.getElementById('filters-solicitudes').style.display = 'none';
+    
+    // Muestra la sección de filtros de préstamos
+    document.getElementById('filters-prestamos').style.display = 'block';
+
+    // Limpiar los filtros de préstamos
+    document.getElementById('filtroTipoEquipo').value = '';  // Limpiar el select
+    document.getElementById('filtroEstadoPrestamo').value = '';  // Limpiar el select
+    document.getElementById('filtroFechaEntrega').value = '';  // Limpiar el input de fecha
+}
+
 
 
 function approveRequest(id) {
@@ -250,15 +290,25 @@ function logout() {
 }
 
 function filtrar() {
-    const tipoUsuario = document.getElementById('filtroTipoUsuario').value;
-    const estado = document.getElementById('filtroEstado').value;
-    const fechaInicio = document.getElementById('filtroFechaInicio').value;
+    if (tipoDeTabla === 'solicitudes' || tipoDeTabla === 'historial-solicitudes') {
+        const tipoUsuario = document.getElementById('filtroTipoUsuario').value;
+        const estado = document.getElementById('filtroEstado').value;
+        const fechaInicio = document.getElementById('filtroFechaInicio').value;
 
-    obtenerDatosFiltrados(tipoUsuario, estado, fechaInicio, tipoDeTabla);  // Usar tipoDeTabla aquí
-    console.log(tipoUsuario, estado, fechaInicio, tipoDeTabla);
+        obtenerDatosFiltradosSolicitudes(tipoUsuario, estado, fechaInicio, tipoDeTabla);  // Usar tipoDeTabla aquí
+        console.log(tipoUsuario, estado, fechaInicio, tipoDeTabla);
+    } else if (tipoDeTabla === 'prestamos' || tipoDeTabla === 'historial-prestamos') {
+        const tipoEquipo = document.getElementById('filtroTipoEquipo').value;
+        const estado = document.getElementById('filtroEstadoPrestamo').value;
+        const fechaEntrega = document.getElementById('filtroFechaEntrega').value;
+
+        obtenerDatosFiltradosPrestamos(tipoEquipo, estado, fechaEntrega, tipoDeTabla);
+        console.log(tipoEquipo, estado, fechaEntrega, tipoDeTabla);
+    }
 }
 
-function obtenerDatosFiltrados(tipoUsuario, estado, fechaInicio) {
+
+function obtenerDatosFiltradosSolicitudes(tipoUsuario, estado, fechaInicio,tipoDeTabla) {
     const queryParams = new URLSearchParams({
         tipo_usuario: tipoUsuario,
         estado: estado,
@@ -266,13 +316,29 @@ function obtenerDatosFiltrados(tipoUsuario, estado, fechaInicio) {
     });
 
     let endpoint = '';
-    if (tipoDeTabla === 'solicitudes') {
+    if (tipoDeTabla === 'solicitudes' || tipoDeTabla === 'historial-solicitudes') {
         endpoint = `/solicitudes/solicitudes-filtradas?${queryParams}`;
-    } else if (tipoDeTabla === 'prestamos') {
-        endpoint = `/solicitudes/prestamos-filtrados?${queryParams}`;
-    } else if (tipoDeTabla === 'historial-solicitudes') {
-        endpoint = `/solicitudes/solicitudes-filtradas?${queryParams}`;
-    } else if (tipoDeTabla === 'historial-prestamos') {
+    }
+    fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+            mostrarDatos(data, tipoDeTabla); // Aquí se pasa el tipo correcto para mostrar los datos.
+        })
+        .catch(error => {
+            console.error('Error al obtener datos filtrados:', error);
+        });
+}
+
+function obtenerDatosFiltradosPrestamos(tipoEquipo, estado, fechaEntrega, tipoDeTabla) {
+    // Verifica si fechaEntrega tiene un valor y formatea correctamente
+    let queryParams = new URLSearchParams({
+        tipo_equipo: tipoEquipo,
+        estado_prestamo: estado,
+        fecha_entrega: fechaEntrega ? fechaEntrega.replace('T', ' ') : ''  // Formato sin 'T'
+    });
+
+    let endpoint = '';
+    if (tipoDeTabla === 'prestamos' || tipoDeTabla === 'historial-prestamos') {
         endpoint = `/solicitudes/prestamos-filtrados?${queryParams}`;
     }
 
@@ -285,6 +351,7 @@ function obtenerDatosFiltrados(tipoUsuario, estado, fechaInicio) {
             console.error('Error al obtener datos filtrados:', error);
         });
 }
+
 
 
 function mostrarDatos(data, type) {
@@ -304,7 +371,7 @@ function mostrarDatos(data, type) {
                 <td>${item.correo || 'No especificado'}</td>
                 <td>${item.ubicacion_actual || 'No especificado'}</td>
                 <td>${formatDate(item.fecha_inicio)}</td>
-                <td>${formatDate(item.fecha_entrega)}</td>
+                <td>${formatDateHours(item.fecha_entrega)}</td>
                 <td>${item.estado}</td>
                 <td>${item.nombre_equipo || 'No especificado'}</td>
                 <td>
@@ -330,8 +397,8 @@ function mostrarDatos(data, type) {
                 <td>${item.id_prestamo}</td>
                 <td>${item.tipo_equipo}</td>
                 <td>${item.id_solicitud}</td>
-                <td>${formatDate(item.fecha_entrega)}</td>
-                <td>${formatDate(item.fecha_devolucion)}</td>
+                <td>${formatDateHours(item.fecha_entrega)}</td>
+                <td>${formatDateHours(item.fecha_devolucion)}</td>
                 <td>${item.estado_prestamo}</td>
                 <td>
                     <button class="btn-acciones btn-general" onclick="approveRequest(${item.id_prestamo})">Entregado</button>
@@ -356,7 +423,7 @@ function mostrarDatos(data, type) {
                 <td>${item.correo || 'No especificado'}</td>
                 <td>${item.ubicacion_actual || 'No especificado'}</td>
                 <td>${formatDate(item.fecha_inicio)}</td>
-                <td>${formatDate(item.fecha_entrega)}</td>
+                <td>${formatDateHours(item.fecha_entrega)}</td>
                 <td>${item.estado}</td>
                 <td>${item.nombre_equipo || 'No especificado'}</td>
             `;
@@ -369,8 +436,8 @@ function mostrarDatos(data, type) {
                 <td>${item.id_prestamo}</td>
                 <td>${item.tipo_equipo}</td>
                 <td>${item.id_solicitud}</td>
-                <td>${formatDate(item.fecha_entrega)}</td>
-                <td>${formatDate(item.fecha_devolucion)}</td>
+                <td>${formatDateHours(item.fecha_entrega)}</td>
+                <td>${formatDateHours(item.fecha_devolucion)}</td>
                 <td>${item.estado_prestamo}</td>
             `;
             tableBody.appendChild(row);
