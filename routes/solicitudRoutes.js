@@ -283,25 +283,88 @@ router.post('/entregado/:id', (req, res) => {
     });
 });
 
-// Obtener estadísticas de solicitudes
+// Ruta para cargar estadísticas
 router.get('/estadisticas', (req, res) => {
-    const query = `
-        SELECT 
-            COUNT(*) AS total,
-            SUM(CASE WHEN estado = 'Aprobada' THEN 1 ELSE 0 END) AS aprobadas,
-            SUM(CASE WHEN estado = 'Rechazada' THEN 1 ELSE 0 END) AS rechazadas,
-            SUM(CASE WHEN estado = 'Pendiente' THEN 1 ELSE 0 END) AS pendientes
-        FROM solicitudes
+    // Consulta para obtener las estadísticas de solicitudes
+    const solicitudesStatsQuery = `
+      SELECT 
+        COUNT(*) AS total_solicitudes,
+        SUM(CASE WHEN estado = 'Aprobada' THEN 1 ELSE 0 END) AS aprobadas,
+        SUM(CASE WHEN estado = 'Rechazada' THEN 1 ELSE 0 END) AS rechazadas,
+        SUM(CASE WHEN estado = 'Pendiente' THEN 1 ELSE 0 END) AS pendientes
+      FROM solicitudes;
     `;
-    connection.query(query, (err, results) => {
+  
+    // Consulta para obtener las estadísticas de préstamos
+    const prestamosStatsQuery = `
+      SELECT 
+        SUM(CASE WHEN estado_prestamo = 'Entregado' THEN 1 ELSE 0 END) AS entregados,
+        SUM(CASE WHEN estado_prestamo = 'No entregado' THEN 1 ELSE 0 END) AS no_entregados
+      FROM prestamos;
+    `;
+  
+    // Consulta para obtener el equipo más solicitado
+    const equipoMasSolicitadoQuery = `
+      SELECT e.tipo_equipo, COUNT(s.id_solicitud) AS cantidad_solicitudes
+      FROM solicitudes s
+      INNER JOIN equipos e ON s.id_equipo = e.id_equipo
+      GROUP BY e.tipo_equipo
+      ORDER BY cantidad_solicitudes DESC
+      LIMIT 1;
+    `;
+  
+    // Consulta para obtener el equipo menos solicitado
+    const equipoMenosSolicitadoQuery = `
+      SELECT e.tipo_equipo, COUNT(s.id_solicitud) AS cantidad_solicitudes
+      FROM solicitudes s
+      INNER JOIN equipos e ON s.id_equipo = e.id_equipo
+      GROUP BY e.tipo_equipo
+      ORDER BY cantidad_solicitudes ASC
+      LIMIT 1;
+    `;
+  
+    // Ejecutar las consultas para obtener todas las estadísticas
+    connection.query(solicitudesStatsQuery, (err, solicitudesResults) => {
+      if (err) {
+        console.error('Error al obtener las estadísticas de solicitudes: ' + err.stack);
+        return res.status(500).send('Error al obtener las estadísticas de solicitudes');
+      }
+  
+      connection.query(prestamosStatsQuery, (err, prestamosResults) => {
         if (err) {
-            console.error('Error al obtener estadísticas:', err);
-            res.status(500).json({ error: 'Error al obtener estadísticas' });
-        } else {
-            res.json(results[0]);
+          console.error('Error al obtener las estadísticas de préstamos: ' + err.stack);
+          return res.status(500).send('Error al obtener las estadísticas de préstamos');
         }
+  
+        connection.query(equipoMasSolicitadoQuery, (err, equipoMasSolicitadoResults) => {
+          if (err) {
+            console.error('Error al obtener el equipo más solicitado: ' + err.stack);
+            return res.status(500).send('Error al obtener el equipo más solicitado');
+          }
+  
+          connection.query(equipoMenosSolicitadoQuery, (err, equipoMenosSolicitadoResults) => {
+            if (err) {
+              console.error('Error al obtener el equipo menos solicitado: ' + err.stack);
+              return res.status(500).send('Error al obtener el equipo menos solicitado');
+            }
+  
+            // Devolver todos los resultados de las estadísticas
+            res.status(200).json({
+              totalSolicitudes: solicitudesResults[0].total_solicitudes,
+              aprobadas: solicitudesResults[0].aprobadas,
+              rechazadas: solicitudesResults[0].rechazadas,
+              pendientes: solicitudesResults[0].pendientes,
+              entregados: prestamosResults[0].entregados,
+              noEntregados: prestamosResults[0].no_entregados,
+              equipoMasSolicitado: equipoMasSolicitadoResults[0],
+              equipoMenosSolicitado: equipoMenosSolicitadoResults[0]
+            });
+          });
+        });
+      });
     });
-});
+  });
+  
 
 
 module.exports = router;

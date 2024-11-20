@@ -119,7 +119,7 @@ function loadStatistics() {
         .then(data => {
             const statsContainer = document.getElementById('stats-container');
             statsContainer.innerHTML = `
-                <p>Total de Solicitudes: ${data.total}</p>
+                <p>Total de Solicitudes: ${data.totalSolicitudes}</p>
                 <p>Aprobadas: ${data.aprobadas}</p>
                 <p>Rechazadas: ${data.rechazadas}</p>
                 <p>Pendientes: ${data.pendientes}</p>
@@ -175,8 +175,6 @@ function listarFiltrosPrestamos() {
     document.getElementById('filtroEstadoPrestamo').value = '';  // Limpiar el select
     document.getElementById('filtroFechaEntrega').value = '';  // Limpiar el input de fecha
 }
-
-
 
 function approveRequest(id) {
     if(tipoDeTabla === 'solicitudes'){
@@ -234,7 +232,6 @@ function rejectRequest(id) {
         });
 }
 
-
 function openDeleteModal(id) {
     deleteRequestId = id;
 
@@ -269,7 +266,6 @@ function confirmDeleteRequest() {
             });
     }
 }
-
 
 function logout() {
     fetch('/solicitudes/logout', {
@@ -306,7 +302,6 @@ function filtrar() {
         console.log(tipoEquipo, estado, fechaEntrega, tipoDeTabla);
     }
 }
-
 
 function obtenerDatosFiltradosSolicitudes(tipoUsuario, estado, fechaInicio,tipoDeTabla) {
     const queryParams = new URLSearchParams({
@@ -351,8 +346,6 @@ function obtenerDatosFiltradosPrestamos(tipoEquipo, estado, fechaEntrega, tipoDe
             console.error('Error al obtener datos filtrados:', error);
         });
 }
-
-
 
 function mostrarDatos(data, type) {
     const tableBody = document.getElementById('request-table-body');
@@ -444,3 +437,4 @@ function mostrarDatos(data, type) {
         });
     }
 }
+
