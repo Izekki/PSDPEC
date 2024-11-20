@@ -204,21 +204,79 @@ router.get('/prestamos-filtrados', (req, res) => {
     });
 });
 
-//Ruta Aprobar una solicitud de préstamo
+// Ruta Aprobar una solicitud de préstamo y crear préstamo automáticamente
 router.post('/aprobar/:id', (req, res) => {
     const { id } = req.params;
 
-    const query = 'UPDATE solicitudes SET estado = "Aprobada" WHERE id_solicitud = ?';
-    connection.query(query, [id], (err, result) => {
+    console.log('Aprobando solicitud con ID:', id);  // Mensaje de depuración
+
+    // Primero, obtener los datos necesarios de la solicitud aprobada
+    const querySolicitud = `
+        SELECT s.id_solicitud, s.id_equipo, s.fecha_inicio, s.fecha_entrega
+        FROM solicitudes s
+        WHERE s.id_solicitud = ? AND s.estado = 'Pendiente'
+    `;
+
+    connection.query(querySolicitud, [id], (err, results) => {
         if (err) {
-            console.error('Error al aprobar la solicitud:', err);
-            return res.status(500).json({ error: 'Error al aprobar la solicitud' });
-        }if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Solicitud no encontrada' });
+            console.error('Error al obtener la solicitud:', err);
+            return res.status(500).json({ error: 'Error al obtener la solicitud' });
         }
-        res.json({ message: 'Solicitud aprobada correctamente' });
+
+        if (results.length === 0) {
+            console.log('No se encontró la solicitud o no está pendiente');
+            return res.status(404).json({ error: 'Solicitud no encontrada o no está pendiente' });
+        }
+
+        console.log('Solicitud encontrada:', results[0]);  // Mensaje de depuración
+
+        // Extraer los datos de la solicitud
+        const solicitud = results[0];
+        const idSolicitud = solicitud.id_solicitud;
+        const idEquipo = solicitud.id_equipo;
+        const fechaEntrega = solicitud.fecha_entrega;
+
+        // Actualizar la solicitud a "Aprobada"
+        const updateSolicitudQuery = 'UPDATE solicitudes SET estado = "Aprobada" WHERE id_solicitud = ?';
+        
+        connection.query(updateSolicitudQuery, [id], (err, updateResult) => {
+            if (err) {
+                console.error('Error al actualizar la solicitud:', err);
+                return res.status(500).json({ error: 'Error al actualizar la solicitud' });
+            }
+
+            if (updateResult.affectedRows === 0) {
+                console.log('No se actualizó la solicitud');
+                return res.status(404).json({ error: 'Solicitud no encontrada' });
+            }
+
+            console.log('Solicitud actualizada correctamente');
+
+            // Insertar el préstamo en la tabla de prestamos (agregar hora_inicio y hora_fin)
+            const horaInicio = '09:00:00'; // Asumiendo una hora de inicio predeterminada
+            const horaFin = '10:00:00'; // Asumiendo una hora de fin predeterminada
+
+            const insertPrestamoQuery = `
+                INSERT INTO prestamos (id_solicitud, fecha_entrega, hora_inicio, hora_fin, estado_prestamo)
+                VALUES (?, ?, ?, ?, 'No entregado')
+            `;
+            
+            connection.query(insertPrestamoQuery, [idSolicitud, fechaEntrega, horaInicio, horaFin], (err, insertResult) => {
+                if (err) {
+                    console.error('Error al crear el préstamo:', err);
+                    return res.status(500).json({ error: 'Error al crear el préstamo' });
+                }
+
+                console.log('Préstamo creado correctamente');
+                res.json({ message: 'Solicitud aprobada y préstamo creado correctamente' });
+            });
+        });
     });
 });
+
+
+
+
 
 //Ruta Rechazar una solicitud de préstamo
 router.post('/rechazar/:id', (req, res) => {
