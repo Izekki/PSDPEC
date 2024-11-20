@@ -77,7 +77,7 @@ function formatDateHours(dateString) {
         second: '2-digit'
     };
     const date = new Date(dateString);
-    return date.toLocaleString('es-ES', options); // Muestra fecha y hora
+    return date.toLocaleString('es-ES', options);
 }
 
 function loadData(endpoint, type) {
@@ -151,29 +151,23 @@ function listarPrestamosHistorial() {
 }
 
 function listarFiltrosSolicitudes() {
-    // Oculta la sección de filtros de préstamos
     document.getElementById('filters-prestamos').style.display = 'none';
     
-    // Muestra la sección de filtros de solicitudes
     document.getElementById('filters-solicitudes').style.display = 'block';
 
-    // Limpiar los filtros de solicitudes
-    document.getElementById('filtroTipoUsuario').value = '';  // Limpiar el select
-    document.getElementById('filtroEstado').value = '';  // Limpiar el select
-    document.getElementById('filtroFechaInicio').value = '';  // Limpiar el input de fecha
+    document.getElementById('filtroTipoUsuario').value = '';  
+    document.getElementById('filtroEstado').value = ''; 
+    document.getElementById('filtroFechaInicio').value = '';
 }
 
 function listarFiltrosPrestamos() {
-    // Oculta la sección de filtros de solicitudes
     document.getElementById('filters-solicitudes').style.display = 'none';
     
-    // Muestra la sección de filtros de préstamos
     document.getElementById('filters-prestamos').style.display = 'block';
 
-    // Limpiar los filtros de préstamos
-    document.getElementById('filtroTipoEquipo').value = '';  // Limpiar el select
-    document.getElementById('filtroEstadoPrestamo').value = '';  // Limpiar el select
-    document.getElementById('filtroFechaEntrega').value = '';  // Limpiar el input de fecha
+    document.getElementById('filtroTipoEquipo').value = '';  
+    document.getElementById('filtroEstadoPrestamo').value = '';  
+    document.getElementById('filtroFechaEntrega').value = ''; 
 }
 
 function approveRequest(id) {
@@ -234,8 +228,6 @@ function rejectRequest(id) {
 
 function openDeleteModal(id) {
     deleteRequestId = id;
-
-
     const modal = document.getElementById('confirmationModal');
     modal.style.display = 'block';
 }
@@ -257,12 +249,12 @@ function confirmDeleteRequest() {
             .then(data => {
                 alert(data.message);
                 loadRequests();
-                closeDeleteModal(); // Cerrar el modal después de eliminar
+                closeDeleteModal();
             })
             .catch(error => {
                 console.error('Error al eliminar solicitud:', error);
                 alert('Ocurrió un error al eliminar la solicitud. Inténtalo de nuevo.');
-                closeDeleteModal(); // Cerrar el modal si ocurre un error
+                closeDeleteModal();
             });
     }
 }
@@ -292,14 +284,12 @@ function filtrar() {
         const fechaInicio = document.getElementById('filtroFechaInicio').value;
 
         obtenerDatosFiltradosSolicitudes(tipoUsuario, estado, fechaInicio, tipoDeTabla);  // Usar tipoDeTabla aquí
-        console.log(tipoUsuario, estado, fechaInicio, tipoDeTabla);
     } else if (tipoDeTabla === 'prestamos' || tipoDeTabla === 'historial-prestamos') {
         const tipoEquipo = document.getElementById('filtroTipoEquipo').value;
         const estado = document.getElementById('filtroEstadoPrestamo').value;
         const fechaEntrega = document.getElementById('filtroFechaEntrega').value;
 
         obtenerDatosFiltradosPrestamos(tipoEquipo, estado, fechaEntrega, tipoDeTabla);
-        console.log(tipoEquipo, estado, fechaEntrega, tipoDeTabla);
     }
 }
 
@@ -317,7 +307,7 @@ function obtenerDatosFiltradosSolicitudes(tipoUsuario, estado, fechaInicio,tipoD
     fetch(endpoint)
         .then(response => response.json())
         .then(data => {
-            mostrarDatos(data, tipoDeTabla); // Aquí se pasa el tipo correcto para mostrar los datos.
+            mostrarDatos(data, tipoDeTabla);
         })
         .catch(error => {
             console.error('Error al obtener datos filtrados:', error);
@@ -325,11 +315,10 @@ function obtenerDatosFiltradosSolicitudes(tipoUsuario, estado, fechaInicio,tipoD
 }
 
 function obtenerDatosFiltradosPrestamos(tipoEquipo, estado, fechaEntrega, tipoDeTabla) {
-    // Verifica si fechaEntrega tiene un valor y formatea correctamente
     let queryParams = new URLSearchParams({
         tipo_equipo: tipoEquipo,
         estado_prestamo: estado,
-        fecha_entrega: fechaEntrega ? fechaEntrega.replace('T', ' ') : ''  // Formato sin 'T'
+        fecha_entrega: fechaEntrega ? fechaEntrega.replace('T', ' ') : ''
     });
 
     let endpoint = '';
@@ -340,7 +329,7 @@ function obtenerDatosFiltradosPrestamos(tipoEquipo, estado, fechaEntrega, tipoDe
     fetch(endpoint)
         .then(response => response.json())
         .then(data => {
-            mostrarDatos(data, tipoDeTabla); // Aquí se pasa el tipo correcto para mostrar los datos.
+            mostrarDatos(data, tipoDeTabla);
         })
         .catch(error => {
             console.error('Error al obtener datos filtrados:', error);
@@ -351,7 +340,6 @@ function mostrarDatos(data, type) {
     const tableBody = document.getElementById('request-table-body');
     tableBody.innerHTML = '';
 
-    // Limpiar el contenedor de historial
     const historialButtonContainer = document.getElementById('historial-button-container');
     historialButtonContainer.innerHTML = '';
 
@@ -376,11 +364,10 @@ function mostrarDatos(data, type) {
             tableBody.appendChild(row);
         });
 
-        // Crear el botón de historial dinámicamente para solicitudes
         const historialButton = document.createElement('button');
         historialButton.textContent = 'Ver Historial de Solicitudes';
         historialButton.classList.add('btn-acciones', 'btn-general');
-        historialButton.onclick = listarSolicitudesHistorial; // Llamar a listarHistorial al hacer clic
+        historialButton.onclick = listarSolicitudesHistorial; 
         historialButtonContainer.appendChild(historialButton);
 
     } else if (type === 'prestamos') {
@@ -400,11 +387,10 @@ function mostrarDatos(data, type) {
             tableBody.appendChild(row);
         });
 
-        // Crear el botón de historial dinámicamente para préstamos
         const historialButton = document.createElement('button');
         historialButton.textContent = 'Ver Historial de Préstamos';
         historialButton.classList.add('btn-acciones', 'btn-general');
-        historialButton.onclick = listarPrestamosHistorial; // Llamar a listarPrestamosHistorial al hacer clic
+        historialButton.onclick = listarPrestamosHistorial; 
         historialButtonContainer.appendChild(historialButton);
 
     } else if (type === 'historial-solicitudes') {
@@ -438,3 +424,12 @@ function mostrarDatos(data, type) {
     }
 }
 
+function downloadCSV() {
+    const newTab = window.open('', '_blank');
+
+    newTab.location.href = '/solicitudes/estadisticas/descargar';
+
+    setTimeout(() => {
+        newTab.close();
+    }, 1000);
+}
