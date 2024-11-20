@@ -352,7 +352,7 @@ function mostrarDatos(data, type) {
                 <td>${item.correo || 'No especificado'}</td>
                 <td>${item.ubicacion_actual || 'No especificado'}</td>
                 <td>${formatDate(item.fecha_inicio)}</td>
-                <td>${formatDateHours(item.fecha_entrega)}</td>
+                <td>${formatDate(item.fecha_entrega)}</td>
                 <td>${item.estado}</td>
                 <td>${item.nombre_equipo || 'No especificado'}</td>
                 <td>
@@ -402,7 +402,7 @@ function mostrarDatos(data, type) {
                 <td>${item.correo || 'No especificado'}</td>
                 <td>${item.ubicacion_actual || 'No especificado'}</td>
                 <td>${formatDate(item.fecha_inicio)}</td>
-                <td>${formatDateHours(item.fecha_entrega)}</td>
+                <td>${formatDate(item.fecha_entrega)}</td>
                 <td>${item.estado}</td>
                 <td>${item.nombre_equipo || 'No especificado'}</td>
             `;

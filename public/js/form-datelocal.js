@@ -7,14 +7,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const fechaMin = new Date(fechaInicio);
         const fechaMax = new Date(fechaInicio);
-        fechaMax.setHours(fechaMax.getHours() + 2);
+        fechaMax.setHours(fechaMax.getHours() + 2); 
 
-        const fechaMinStr = fechaMin.toISOString().slice(0, 16);
-        const fechaMaxStr = fechaMax.toISOString().slice(0, 16);
+        const fechaMinStr = fechaMin.toLocaleString('sv-SE').slice(0, 16);
+        const fechaMaxStr = fechaMax.toLocaleString('sv-SE').slice(0, 16);
 
         fechaFinInput.min = fechaMinStr;
         fechaFinInput.max = fechaMaxStr;
 
         fechaFinInput.value = fechaMaxStr;
+
+        fechaFinInput.disabled = true;
     });
 });
