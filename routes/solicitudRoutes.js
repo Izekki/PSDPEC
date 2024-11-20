@@ -208,11 +208,8 @@ router.get('/prestamos-filtrados', (req, res) => {
 router.post('/aprobar/:id', (req, res) => {
     const { id } = req.params;
 
-    console.log('Aprobando solicitud con ID:', id);  // Mensaje de depuración
-
-    // Primero, obtener los datos necesarios de la solicitud aprobada
     const querySolicitud = `
-        SELECT s.id_solicitud, s.id_equipo, s.fecha_inicio, s.fecha_entrega
+        SELECT s.id_solicitud, s.id_equipo, s.fecha_inicio, s.fecha_entrega, s.tipo_usuario
         FROM solicitudes s
         WHERE s.id_solicitud = ? AND s.estado = 'Pendiente'
     `;
@@ -228,15 +225,13 @@ router.post('/aprobar/:id', (req, res) => {
             return res.status(404).json({ error: 'Solicitud no encontrada o no está pendiente' });
         }
 
-        console.log('Solicitud encontrada:', results[0]);  // Mensaje de depuración
-
-        // Extraer los datos de la solicitud
         const solicitud = results[0];
         const idSolicitud = solicitud.id_solicitud;
         const idEquipo = solicitud.id_equipo;
+        const fechaInicio = solicitud.fecha_inicio;
         const fechaEntrega = solicitud.fecha_entrega;
+        const tipoUsuario = solicitud.tipo_usuario;
 
-        // Actualizar la solicitud a "Aprobada"
         const updateSolicitudQuery = 'UPDATE solicitudes SET estado = "Aprobada" WHERE id_solicitud = ?';
         
         connection.query(updateSolicitudQuery, [id], (err, updateResult) => {
@@ -252,16 +247,26 @@ router.post('/aprobar/:id', (req, res) => {
 
             console.log('Solicitud actualizada correctamente');
 
-            // Insertar el préstamo en la tabla de prestamos (agregar hora_inicio y hora_fin)
-            const horaInicio = '09:00:00'; // Asumiendo una hora de inicio predeterminada
-            const horaFin = '10:00:00'; // Asumiendo una hora de fin predeterminada
+            let fechaDevolucion;
+            let fechaEntregaCorrecta = fechaEntrega;
+
+            if (tipoUsuario === 'estudiante') {
+                fechaEntregaCorrecta = fechaInicio;
+                fechaDevolucion = fechaEntrega; 
+            } else {
+
+                fechaDevolucion = fechaEntrega;
+            }
+
+            const horaInicio = '00:00:00';
+            const horaFin = '02:00:00';
 
             const insertPrestamoQuery = `
-                INSERT INTO prestamos (id_solicitud, fecha_entrega, hora_inicio, hora_fin, estado_prestamo)
-                VALUES (?, ?, ?, ?, 'No entregado')
+                INSERT INTO prestamos (id_solicitud, fecha_entrega, fecha_devolucion, hora_inicio, hora_fin, estado_prestamo)
+                VALUES (?, ?, ?, ?, ?, 'No entregado')
             `;
             
-            connection.query(insertPrestamoQuery, [idSolicitud, fechaEntrega, horaInicio, horaFin], (err, insertResult) => {
+            connection.query(insertPrestamoQuery, [idSolicitud, fechaEntregaCorrecta, fechaDevolucion, horaInicio, horaFin], (err, insertResult) => {
                 if (err) {
                     console.error('Error al crear el préstamo:', err);
                     return res.status(500).json({ error: 'Error al crear el préstamo' });
@@ -273,8 +278,6 @@ router.post('/aprobar/:id', (req, res) => {
         });
     });
 });
-
-
 
 
 
