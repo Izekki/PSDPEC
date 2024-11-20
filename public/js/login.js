@@ -13,10 +13,8 @@ document.getElementById('login-button').addEventListener('click', async () => {
         const data = await response.json();
 
         if (data.success) {
-            // Redirigir a la URL proporcionada
             window.location.href = data.redirectUrl;
         } else {
-            // Mostrar mensaje de error
             errorMessage.textContent = data.message;
             errorMessage.style.display = 'block';
         }
