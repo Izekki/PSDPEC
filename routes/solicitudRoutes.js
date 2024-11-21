@@ -4,7 +4,11 @@ const connection = require('../db/connection');
 const session = require('express-session');
 const XLSX = require('xlsx');
 const nodemailer = require("nodemailer");
+const MySQLStore = require('express-mysql-session')(session);
+
+
 require('dotenv').config();
+
 
 
 // Configurar express-session
@@ -547,10 +551,11 @@ router.post('/recordar/:id', (req, res) => {
     console.log('Sesion actual:',req.session)
 
 
-    if (!req.session.userId || !req.session.userEmail || !req.session.userPass) {
+    if (!req.session.userEmail || !req.session.userPass) {
         return res.status(401).json({ error: 'No estás autenticado para enviar correos.' });
     }
-/*
+    
+
     const idPrestamo = req.params.id;
 
     const query = `
@@ -574,10 +579,11 @@ router.post('/recordar/:id', (req, res) => {
             const nombreEquipoEntrega = results[0].nombre_equipo;
     
             const transporter = nodemailer.createTransport({
-                service: 'hotmail',
+                host: 'sandbox.smtp.mailtrap.io',
+                port: '2525',
                 auth: {
-                    user: req.session.userEmail,
-                    pass: req.session.userPass
+                    user: "2519c23e5f5cc5", //req.session.userEmail,
+                    pass: "8ae64860237e19" //req.session.userPass
                 }
             });
     
@@ -585,7 +591,7 @@ router.post('/recordar/:id', (req, res) => {
     
             if (tipoUsuarioCorreo === 'estudiante') {
                 mailOptions = {
-                    from: `"Sistema de Préstamos" <${req.session.userEmail}>`,
+                    from: `${req.session.userEmail}`,
                     to: correoDestino,
                     subject: 'Recordatorio: Fecha próxima de Devolución del equipo asignado',
                     text: `Hola ${correoDestino},
@@ -604,11 +610,11 @@ router.post('/recordar/:id', (req, res) => {
     
     Saludos cordiales,
     Centro de Cómputo, Universidad Veracruzana.
-    ${correo}`
+    ${req.session.userEmail}`
                 };
             } else if (tipoUsuarioCorreo === 'profesor') {
                 mailOptions = {
-                    from: `"Sistema de Préstamos" <${req.session.userEmail}>`,
+                    from: `${req.session.userEmail}`,
                     to: correoDestino,
                     subject: 'Recordatorio: Fecha próxima de Devolución del equipo asignado',
                     text: `Estimado(a) Docente ${correoDestino},
@@ -627,7 +633,7 @@ router.post('/recordar/:id', (req, res) => {
     
     Saludos cordiales,
     Centro de Cómputo, Universidad Veracruzana.
-    ${correo}`
+    ${req.session.userEmail}`
                 };
             } else {
                 return res.status(400).json({ error: 'Tipo de usuario desconocido' });
@@ -645,7 +651,7 @@ router.post('/recordar/:id', (req, res) => {
         } else {
             res.status(404).send('No se encontró un correo asociado al préstamo');
         }
-    }); */   
+    });
 });
 
 module.exports = router;
