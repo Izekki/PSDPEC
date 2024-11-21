@@ -434,6 +434,12 @@ function enviarCorreo(id) {
         if (!response.ok) {
             throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success) {
+            alert('¡Notificación enviada correctamente!');
+        } 
     })
     .catch(error => {
         console.error('Error al recordar:', error);

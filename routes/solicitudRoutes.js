@@ -547,15 +547,9 @@ router.get('/estadisticas/descargar', (req, res) => {
 
 
 router.post('/recordar/:id', (req, res) => {
-
-    console.log('Sesion actual:',req.session)
-
-
     if (!req.session.userEmail || !req.session.userPass) {
         return res.status(401).json({ error: 'No estás autenticado para enviar correos.' });
     }
-    
-
     const idPrestamo = req.params.id;
 
     const query = `
@@ -582,8 +576,8 @@ router.post('/recordar/:id', (req, res) => {
                 host: 'sandbox.smtp.mailtrap.io',
                 port: '2525',
                 auth: {
-                    user: "2519c23e5f5cc5", //req.session.userEmail,
-                    pass: "8ae64860237e19" //req.session.userPass
+                    user: process.env.MP_USER, //req.session.userEmail,
+                    pass: process.env.MP_PASS//req.session.userPass
                 }
             });
     
