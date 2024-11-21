@@ -382,6 +382,7 @@ function mostrarDatos(data, type) {
                 <td>${item.estado_prestamo}</td>
                 <td>
                     <button class="btn-acciones btn-general" onclick="approveRequest(${item.id_prestamo})">Entregado</button>
+                    <button class="btn-acciones btn-general" onclick="enviarCorreo(${item.id_prestamo})">Recordar</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -422,6 +423,25 @@ function mostrarDatos(data, type) {
             tableBody.appendChild(row);
         });
     }
+}
+
+
+function enviarCorreo(id) {
+    fetch(`/solicitudes/recordar/${id}`, { method: 'POST' })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            loadRequests();
+        })
+        .catch(error => {
+            console.error('Error al rechazar solicitud:', error);
+            alert('Ocurrió un error al rechazar la solicitud. Inténtalo de nuevo.');
+        });
 }
 
 function downloadCSV() {

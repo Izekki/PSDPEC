@@ -3,6 +3,8 @@ const router = express.Router();
 const connection = require('../db/connection');
 const session = require('express-session');
 const XLSX = require('xlsx');
+const nodemailer = requiere("nodemailer");
+
 
 // Configura express-session
 router.use(session({
@@ -24,7 +26,9 @@ router.post('/login', (req, res) => {
         }
 
         if (results.length > 0) {
-            req.session.userId = results[0].id; // Guarda el ID del usuario en la sesión
+            req.session.userId = results[0].id;
+            req.session.userEmail = correo;
+            req.session.userPass = contrasenia;
             return res.json({ success: true, redirectUrl: '/formularios/admin' });
         } else {
             return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
@@ -522,5 +526,108 @@ router.get('/estadisticas/descargar', (req, res) => {
     });
 });
 
+
+router.post('/recordar/:id', (req, res) => {
+
+    if (!req.session.userId || !req.session.userEmail || !req.session.userPass) {
+        return res.status(401).json({ error: 'No estás autenticado para enviar correos.' });
+    }
+
+    const { idPrestamo} = req.body;
+
+    const query = `
+        SELECT s.correo, s.tipo_usuario, s.fecha_entrega,e.tipo_equipo AS nombre_equipo
+        FROM prestamos AS p
+        INNER JOIN solicitudes AS s ON p.id_solicitud = s.id_solicitud
+        LEFT JOIN equipos e ON s.id_equipo = e.id_equipo
+        WHERE p.id_prestamo = ?
+    `;
+
+    connection.query(query, [idPrestamo], (err, results) => {
+        if (err) {
+            console.error('Error al ejecutar la consulta:', err);
+            return res.status(500).send('Error en el servidor');
+        }
+    
+        if (results.length > 0) {
+            const correoDestino = results[0].correo;
+            const tipoUsuarioCorreo = results[0].tipo_usuario;
+            const fechaEntregaEquipo = results[0].fecha_entrega;
+            const nombreEquipoEntrega = results[0].nombre_equipo;
+    
+            const transporter = nodemailer.createTransport({
+                service: 'hotmail',
+                auth: {
+                    user: req.session.userEmail,
+                    pass: req.session.userPass
+                }
+            });
+    
+            let mailOptions;
+    
+            if (tipoUsuarioCorreo === 'estudiante') {
+                mailOptions = {
+                    from: `"Sistema de Préstamos" <${req.session.userEmail}>`,
+                    to: correoDestino,
+                    subject: 'Recordatorio: Fecha próxima de Devolución del equipo asignado',
+                    text: `Hola ${correoDestino},
+    
+    Espero que te encuentres bien.
+    Queremos recordarte que la fecha de devolución del equipo asignado se encuentra próxima.
+    Aquí están los detalles de tu préstamo:
+    
+    - Equipo asignado: ${nombreEquipoEntrega}
+    - Fecha de devolución: ${fechaEntregaEquipo}
+    - Ubicación de devolución: Centro de Cómputo
+    
+    Te pedimos que asegures el buen estado del equipo antes de la devolución y que te presentes en el lugar indicado a tiempo. Si tienes algún problema o necesitas extender tu préstamo, por favor acude al Centro de Cómputo.
+    
+    Gracias por tu colaboración.
+    
+    Saludos cordiales,
+    Centro de Cómputo, Universidad Veracruzana.
+    ${correo}`
+                };
+            } else if (tipoUsuarioCorreo === 'profesor') {
+                mailOptions = {
+                    from: `"Sistema de Préstamos" <${req.session.userEmail}>`,
+                    to: correoDestino,
+                    subject: 'Recordatorio: Fecha próxima de Devolución del equipo asignado',
+                    text: `Estimado(a) Docente ${correoDestino},
+    
+    Le escribimos para recordarle que la fecha de devolución del equipo asignado está próxima.
+    A continuación, encontrará los detalles de su préstamo:
+    
+    - Equipo asignado: ${nombreEquipoEntrega}
+    - Fecha de devolución: ${fechaEntregaEquipo}
+    - Ubicación de devolución: Centro de Cómputo
+    
+    Si por algún motivo necesita extender su préstamo o tiene algún inconveniente,
+    no dude en ponerse en contacto con nosotros para gestionar los cambios necesarios.
+    
+    Agradecemos mucho su atención y comprensión.
+    
+    Saludos cordiales,
+    Centro de Cómputo, Universidad Veracruzana.
+    ${correo}`
+                };
+            } else {
+                return res.status(400).json({ error: 'Tipo de usuario desconocido' });
+            }
+    
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Error al enviar correo:', error);
+                    return res.status(500).json({ error: 'Error al enviar el correo' });
+                }
+    
+                console.log('Correo enviado:', info.response);
+                res.json({ message: 'Recordatorio enviado correctamente' });
+            });
+        } else {
+            res.status(404).send('No se encontró un correo asociado al préstamo');
+        }
+    });    
+});
 
 module.exports = router;
