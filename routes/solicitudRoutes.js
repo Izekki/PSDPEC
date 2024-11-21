@@ -573,6 +573,7 @@ router.post('/recordar/:id', (req, res) => {
             const nombreEquipoEntrega = results[0].nombre_equipo;
     
             const transporter = nodemailer.createTransport({
+                //Cambiar cuando se use un servicio SMTP
                 host: 'sandbox.smtp.mailtrap.io',
                 port: '2525',
                 auth: {
