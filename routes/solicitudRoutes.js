@@ -17,10 +17,10 @@ const sessionStore = new MySQLStore({
 });
 
 router.use(session({
-    secret: process.env.SESSION_SECRET, // Usar la clave secreta desde las variables de entorno
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: sessionStore, // Almacenar sesiones en la base de datos
+    store: sessionStore,
     cookie: { secure: false }
 }));
 
