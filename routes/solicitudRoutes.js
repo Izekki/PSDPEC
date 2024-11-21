@@ -3,14 +3,24 @@ const router = express.Router();
 const connection = require('../db/connection');
 const session = require('express-session');
 const XLSX = require('xlsx');
-const nodemailer = requiere("nodemailer");
+const nodemailer = require("nodemailer");
+require('dotenv').config();
 
 
-// Configura express-session
+// Configurar express-session
+const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+});
+
 router.use(session({
-    secret: 'tu_clave_secreta',
+    secret: process.env.SESSION_SECRET, // Usar la clave secreta desde las variables de entorno
     resave: false,
     saveUninitialized: true,
+    store: sessionStore, // Almacenar sesiones en la base de datos
     cookie: { secure: false }
 }));
 
@@ -29,7 +39,13 @@ router.post('/login', (req, res) => {
             req.session.userId = results[0].id;
             req.session.userEmail = correo;
             req.session.userPass = contrasenia;
-            return res.json({ success: true, redirectUrl: '/formularios/admin' });
+            req.session.save((saveErr) => {
+                if (saveErr) {
+                    console.error('Error al guardar la sesión:', saveErr);
+                    return res.status(500).json({ success: false, message: 'Error al guardar la sesión' });
+                }
+                return res.json({ success: true, redirectUrl: '/formularios/admin' });
+            });
         } else {
             return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
         }
@@ -38,7 +54,6 @@ router.post('/login', (req, res) => {
 
 //Ruta para cerrar sesión (logout)
 router.post('/logout', (req, res) => {
-    console.log(req)
     req.session.destroy(err => {
         if (err) {
             return res.status(500).json({ success: false, message: 'Error al cerrar sesión' });
@@ -529,11 +544,14 @@ router.get('/estadisticas/descargar', (req, res) => {
 
 router.post('/recordar/:id', (req, res) => {
 
+    console.log('Sesion actual:',req.session)
+
+
     if (!req.session.userId || !req.session.userEmail || !req.session.userPass) {
         return res.status(401).json({ error: 'No estás autenticado para enviar correos.' });
     }
-
-    const { idPrestamo} = req.body;
+/*
+    const idPrestamo = req.params.id;
 
     const query = `
         SELECT s.correo, s.tipo_usuario, s.fecha_entrega,e.tipo_equipo AS nombre_equipo
@@ -627,7 +645,7 @@ router.post('/recordar/:id', (req, res) => {
         } else {
             res.status(404).send('No se encontró un correo asociado al préstamo');
         }
-    });    
+    }); */   
 });
 
 module.exports = router;

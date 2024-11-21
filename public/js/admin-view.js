@@ -425,24 +425,22 @@ function mostrarDatos(data, type) {
     }
 }
 
-
 function enviarCorreo(id) {
-    fetch(`/solicitudes/recordar/${id}`, { method: 'POST' })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(data.message);
-            loadRequests();
-        })
-        .catch(error => {
-            console.error('Error al rechazar solicitud:', error);
-            alert('Ocurrió un error al rechazar la solicitud. Inténtalo de nuevo.');
-        });
+    fetch(`/solicitudes/recordar/${id}`, {
+        method: 'POST',
+        credentials: 'include',
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error al recordar:', error);
+        alert('Ocurrió un error al notificar. Inténtalo de nuevo.');
+    });
 }
+
 
 function downloadCSV() {
     const newTab = window.open('', '_blank');
