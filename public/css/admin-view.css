@@ -187,9 +187,6 @@ footer {
     width: 100%;
 }
 
-.right-section button:hover {
-    background-color: #1e7e34;
-}
 
 .right-section button:first-child {
     margin-top: 0;
@@ -237,7 +234,7 @@ h3 {
 }
 
 .btn-general:hover {
-    background-color: #1e7e34;
+    color: #FFFFFF; /* Asegura el contraste del texto */
     transform: translateY(-2px); /* Resalta ligeramente el botón */
 }
 
@@ -270,4 +267,30 @@ h3 {
     padding: 10px 20px;
     cursor: pointer;
     margin: 5px;
+}
+
+
+.btn-accion-eliminar{
+    background-color: #FF4D4D;
+}
+
+.btn-accion-rechazar, .btn-prestamos, .btn-estadisticas, .btnFiltrar, .btn-accion-recodar{
+    background-color: #8b8b8b ;
+}
+.btn-accion-eliminar:hover {
+    background-color: #FF1A1A; /* Más brillante */
+    color: #FFFFFF; /* Asegurar buen contraste */
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.4); /* Sutil sombra */
+}
+
+.btn-accion-rechazar:hover, 
+.btn-prestamos:hover, 
+.btn-estadisticas:hover,
+.btn-accion-recodar, 
+.btnFiltrar:hover {
+    background-color: #696969; /* Gris más oscuro */
+    color: #FFFFFF; /* Resaltar el texto */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+
 }
