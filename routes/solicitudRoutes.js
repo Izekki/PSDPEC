@@ -2,15 +2,36 @@ const express = require('express');
 const router = express.Router();
 const connection = require('../db/connection');
 const session = require('express-session');
-const XLSX = require('xlsx');
-const nodemailer = requiere("nodemailer");
+const nodemailer = require("nodemailer");
+const MySQLStore = require('express-mysql-session')(session);
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+const fs = require('fs');
+const path = require('path');
+const ExcelJS = require('exceljs');
+
+const width = 800; // ancho de las gráficas 
+const height = 600; // alto de las gráficas 
+const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
 
 
-// Configura express-session
+require('dotenv').config();
+
+
+
+// Configurar express-session
+const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+});
+
 router.use(session({
-    secret: 'tu_clave_secreta',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    store: sessionStore,
     cookie: { secure: false }
 }));
 
@@ -29,7 +50,13 @@ router.post('/login', (req, res) => {
             req.session.userId = results[0].id;
             req.session.userEmail = correo;
             req.session.userPass = contrasenia;
-            return res.json({ success: true, redirectUrl: '/formularios/admin' });
+            req.session.save((saveErr) => {
+                if (saveErr) {
+                    console.error('Error al guardar la sesión:', saveErr);
+                    return res.status(500).json({ success: false, message: 'Error al guardar la sesión' });
+                }
+                return res.json({ success: true, redirectUrl: '/formularios/admin' });
+            });
         } else {
             return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
         }
@@ -38,7 +65,6 @@ router.post('/login', (req, res) => {
 
 //Ruta para cerrar sesión (logout)
 router.post('/logout', (req, res) => {
-    console.log(req)
     req.session.destroy(err => {
         if (err) {
             return res.status(500).json({ success: false, message: 'Error al cerrar sesión' });
@@ -406,7 +432,7 @@ router.get('/estadisticas', (req, res) => {
   });
 
 // Ruta para cargar estadísticas y generar archivo Excel
-router.get('/estadisticas/descargar', (req, res) => {
+router.get('/estadisticas/descargar', async (req, res) => {
     const solicitudesStatsQuery = `
         SELECT 
             COUNT(*) AS total_solicitudes,
@@ -428,8 +454,7 @@ router.get('/estadisticas/descargar', (req, res) => {
         FROM solicitudes s
         INNER JOIN equipos e ON s.id_equipo = e.id_equipo
         GROUP BY e.tipo_equipo
-        ORDER BY cantidad_solicitudes DESC
-        LIMIT 1;
+        ORDER BY cantidad_solicitudes DESC;
     `;
 
     const equipoMenosSolicitadoQuery = `
@@ -455,29 +480,80 @@ router.get('/estadisticas/descargar', (req, res) => {
         INNER JOIN equipos AS e ON s.id_equipo = e.id_equipo;
     `;
 
-    connection.query(solicitudesStatsQuery, (err, solicitudesResults) => {
+    connection.query(solicitudesStatsQuery, async (err, solicitudesResults) => {
         if (err) {
             console.error('Error al obtener las estadísticas de solicitudes: ' + err.stack);
             return res.status(500).send('Error al obtener las estadísticas de solicitudes');
         }
 
-        connection.query(prestamosStatsQuery, (err, prestamosResults) => {
+        connection.query(prestamosStatsQuery, async (err, prestamosResults) => {
             if (err) {
                 console.error('Error al obtener las estadísticas de préstamos: ' + err.stack);
                 return res.status(500).send('Error al obtener las estadísticas de préstamos');
             }
 
-            connection.query(equipoMasSolicitadoQuery, (err, equipoMasSolicitadoResults) => {
+            connection.query(equipoMasSolicitadoQuery, async (err, equipoMasSolicitadoResults) => {
                 if (err) {
                     console.error('Error al obtener el equipo más solicitado: ' + err.stack);
                     return res.status(500).send('Error al obtener el equipo más solicitado');
                 }
 
-                connection.query(equipoMenosSolicitadoQuery, (err, equipoMenosSolicitadoResults) => {
+                connection.query(equipoMenosSolicitadoQuery, async (err, equipoMenosSolicitadoResults) => {
                     if (err) {
                         console.error('Error al obtener el equipo menos solicitado: ' + err.stack);
                         return res.status(500).send('Error al obtener el equipo menos solicitado');
                     }
+
+                    // Generación de las gráficas
+                    const barChartData = {
+                        labels: ['Aprobadas', 'Rechazadas', 'Pendientes'],
+                        datasets: [{
+                            label: 'Solicitudes',
+                            data: [
+                                solicitudesResults[0].aprobadas,
+                                solicitudesResults[0].rechazadas,
+                                solicitudesResults[0].pendientes
+                            ],
+                            backgroundColor: ['#36a2eb', '#ff6384', '#ffcd56']
+                        }]
+                    };
+
+                    const barChartConfig = {
+                        type: 'bar',
+                        data: barChartData,
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    };
+
+                    const barChartImage = await chartJSNodeCanvas.renderToBuffer(barChartConfig);
+                    fs.writeFileSync(path.join('downloadsSR', 'bar_chart.png'), barChartImage);
+
+                    // Gráfica de pastel con todos los equipos solicitados
+                    const pieChartData = {
+                        labels: equipoMasSolicitadoResults.map(item => `${item.tipo_equipo}: ${item.cantidad_solicitudes}`), // Mostrar equipo y cantidad
+                        datasets: [{
+                            label: 'Equipos Más Solicitados',
+                            data: equipoMasSolicitadoResults.map(item => item.cantidad_solicitudes), // Cantidad de solicitudes por equipo
+                            backgroundColor: ['#36a2eb', '#ff6384', '#ffcd56', '#4bc0c0', '#9966ff', '#ff9f40', '#c9c9c9'],
+                        }]
+                    };
+
+                    const pieChartConfig = {
+                        type: 'pie',
+                        data: pieChartData,
+                        options: {
+                            responsive: true,
+                        }
+                    };
+
+                    const pieChartImage = await chartJSNodeCanvas.renderToBuffer(pieChartConfig);
+                    fs.writeFileSync(path.join('downloadsSR', 'pie_chart.png'), pieChartImage);
 
                     connection.query(solicitudesQuery, (err, solicitudesHistorialResults) => {
                         if (err) {
@@ -502,22 +578,64 @@ router.get('/estadisticas/descargar', (req, res) => {
                                 ['Equipo Menos Solicitado', equipoMenosSolicitadoResults[0].tipo_equipo, 'Solicitudes: ' + equipoMenosSolicitadoResults[0].cantidad_solicitudes]
                             ];
 
-                            const wb = XLSX.utils.book_new();
-                            const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
-                            XLSX.utils.book_append_sheet(wb, statsSheet, 'Estadísticas');
+                            const wb = new ExcelJS.Workbook();
+                            const ws = wb.addWorksheet('Estadísticas');
 
-                            const solicitudesHistorialSheet = XLSX.utils.json_to_sheet(solicitudesHistorialResults);
-                            XLSX.utils.book_append_sheet(wb, solicitudesHistorialSheet, 'Historial de Solicitudes');
+                            // Agregar datos al Excel
+                            statsData.forEach((row, index) => {
+                                ws.addRow(row);
+                            });
 
-                            const prestamosHistorialSheet = XLSX.utils.json_to_sheet(prestamosHistorialResults);
-                            XLSX.utils.book_append_sheet(wb, prestamosHistorialSheet, 'Historial de Préstamos');
+                            // Insertar imágenes
+                            const barImageId = wb.addImage({
+                                filename: path.join('downloadsSR', 'bar_chart.png'),
+                                extension: 'png',
+                            });
+                            ws.addImage(barImageId, 'E1:J17'); // Ajusta las celdas según sea necesario
 
-                            const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+                            const pieImageId = wb.addImage({
+                                filename: path.join('downloadsSR', 'pie_chart.png'),
+                                extension: 'png',
+                            });
+                            ws.addImage(pieImageId, 'E20:J32'); // Ajusta las celdas según sea necesario
 
-                            res.setHeader('Content-Disposition', 'attachment; filename=estadisticas_y_historiales.xlsx');
-                            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                             // Agregar historial de solicitudes
+                            const historialSolicitudesSheet = wb.addWorksheet('Historial de Solicitudes');
+                            historialSolicitudesSheet.columns = [
+                                { header: 'ID Solicitud', key: 'id_solicitud' },
+                                { header: 'Tipo Usuario', key: 'tipo_usuario' },
+                                { header: 'Correo', key: 'correo' },
+                                { header: 'Estado', key: 'estado' },
+                                { header: 'Fecha Inicio', key: 'fecha_inicio' },
+                                { header: 'Fecha Entrega', key: 'fecha_entrega' },
+                                { header: 'Ubicación Actual', key: 'ubicacion_actual' },
+                                { header: 'Equipo', key: 'nombre_equipo' }
+                            ];
+                            historialSolicitudesSheet.addRows(solicitudesHistorialResults);
 
-                            res.send(excelFile);
+                            // Agregar historial de préstamos
+                            const historialPrestamosSheet = wb.addWorksheet('Historial de Préstamos');
+                            historialPrestamosSheet.columns = [
+                                { header: 'ID Préstamo', key: 'id_prestamo' },
+                                { header: 'Equipo', key: 'tipo_equipo' },
+                                { header: 'ID Solicitud', key: 'id_solicitud' },
+                                { header: 'Fecha Entrega', key: 'fecha_entrega' },
+                                { header: 'Fecha Devolución', key: 'fecha_devolucion' },
+                                { header: 'Estado', key: 'estado_prestamo' }
+                            ];
+                            historialPrestamosSheet.addRows(prestamosHistorialResults);
+
+                            wb.xlsx.writeBuffer().then((buffer) => {
+                                const filePath = path.join('downloadsSR', 'estadisticas.xlsx');
+                                fs.writeFileSync(filePath, buffer);
+
+                                res.download(filePath, 'estadisticas.xlsx', () => {
+                                    // Eliminar archivos temporales
+                                    fs.unlinkSync(path.join('downloadsSR', 'bar_chart.png'));
+                                    fs.unlinkSync(path.join('downloadsSR', 'pie_chart.png'));
+                                    fs.unlinkSync(filePath);
+                                });
+                            });
                         });
                     });
                 });
@@ -528,12 +646,10 @@ router.get('/estadisticas/descargar', (req, res) => {
 
 
 router.post('/recordar/:id', (req, res) => {
-
-    if (!req.session.userId || !req.session.userEmail || !req.session.userPass) {
+    if (!req.session.userEmail || !req.session.userPass) {
         return res.status(401).json({ error: 'No estás autenticado para enviar correos.' });
     }
-
-    const { idPrestamo} = req.body;
+    const idPrestamo = req.params.id;
 
     const query = `
         SELECT s.correo, s.tipo_usuario, s.fecha_entrega,e.tipo_equipo AS nombre_equipo
@@ -556,10 +672,12 @@ router.post('/recordar/:id', (req, res) => {
             const nombreEquipoEntrega = results[0].nombre_equipo;
     
             const transporter = nodemailer.createTransport({
-                service: 'hotmail',
+                //Cambiar cuando se use un servicio SMTP
+                host: 'sandbox.smtp.mailtrap.io',
+                port: '2525',
                 auth: {
-                    user: req.session.userEmail,
-                    pass: req.session.userPass
+                    user: process.env.MP_USER, //req.session.userEmail,
+                    pass: process.env.MP_PASS//req.session.userPass
                 }
             });
     
@@ -567,7 +685,7 @@ router.post('/recordar/:id', (req, res) => {
     
             if (tipoUsuarioCorreo === 'estudiante') {
                 mailOptions = {
-                    from: `"Sistema de Préstamos" <${req.session.userEmail}>`,
+                    from: `${req.session.userEmail}`,
                     to: correoDestino,
                     subject: 'Recordatorio: Fecha próxima de Devolución del equipo asignado',
                     text: `Hola ${correoDestino},
@@ -586,11 +704,11 @@ router.post('/recordar/:id', (req, res) => {
     
     Saludos cordiales,
     Centro de Cómputo, Universidad Veracruzana.
-    ${correo}`
+    ${req.session.userEmail}`
                 };
             } else if (tipoUsuarioCorreo === 'profesor') {
                 mailOptions = {
-                    from: `"Sistema de Préstamos" <${req.session.userEmail}>`,
+                    from: `${req.session.userEmail}`,
                     to: correoDestino,
                     subject: 'Recordatorio: Fecha próxima de Devolución del equipo asignado',
                     text: `Estimado(a) Docente ${correoDestino},
@@ -609,7 +727,7 @@ router.post('/recordar/:id', (req, res) => {
     
     Saludos cordiales,
     Centro de Cómputo, Universidad Veracruzana.
-    ${correo}`
+    ${req.session.userEmail}`
                 };
             } else {
                 return res.status(400).json({ error: 'Tipo de usuario desconocido' });
@@ -627,7 +745,7 @@ router.post('/recordar/:id', (req, res) => {
         } else {
             res.status(404).send('No se encontró un correo asociado al préstamo');
         }
-    });    
+    });
 });
 
 module.exports = router;

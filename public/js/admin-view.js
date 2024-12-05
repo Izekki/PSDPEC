@@ -356,9 +356,9 @@ function mostrarDatos(data, type) {
                 <td>${item.estado}</td>
                 <td>${item.nombre_equipo || 'No especificado'}</td>
                 <td>
-                    <button class="btn-acciones btn-general" onclick="approveRequest(${item.id_solicitud})">Aceptar</button>
-                    <button class="btn-acciones btn-general" onclick="rejectRequest(${item.id_solicitud})">Rechazar</button>
-                    <button class="btn-acciones btn-general" onclick="openDeleteModal(${item.id_solicitud})">Eliminar</button>
+                    <button class="btn-acciones btn-general btn-accion-aceptar" onclick="approveRequest(${item.id_solicitud})">Aceptar</button>
+                    <button class="btn-acciones btn-general btn-accion-rechazar" onclick="rejectRequest(${item.id_solicitud})">Rechazar</button>
+                    <button class="btn-acciones btn-general btn-accion-eliminar" onclick="openDeleteModal(${item.id_solicitud})">Eliminar</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -381,8 +381,8 @@ function mostrarDatos(data, type) {
                 <td>${formatDateHours(item.fecha_devolucion)}</td>
                 <td>${item.estado_prestamo}</td>
                 <td>
-                    <button class="btn-acciones btn-general" onclick="approveRequest(${item.id_prestamo})">Entregado</button>
-                    <button class="btn-acciones btn-general" onclick="enviarCorreo(${item.id_prestamo})">Recordar</button>
+                    <button class="btn-acciones btn-general btn-accion-acceptar" onclick="approveRequest(${item.id_prestamo})">Entregado</button>
+                    <button class="btn-acciones btn-general btn-accion-recodar" onclick="enviarCorreo(${item.id_prestamo})">Recordar</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -425,24 +425,28 @@ function mostrarDatos(data, type) {
     }
 }
 
-
 function enviarCorreo(id) {
-    fetch(`/solicitudes/recordar/${id}`, { method: 'POST' })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(data.message);
-            loadRequests();
-        })
-        .catch(error => {
-            console.error('Error al rechazar solicitud:', error);
-            alert('Ocurrió un error al rechazar la solicitud. Inténtalo de nuevo.');
-        });
+    fetch(`/solicitudes/recordar/${id}`, {
+        method: 'POST',
+        credentials: 'include',
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success) {
+            alert('¡Notificación enviada correctamente!');
+        } 
+    })
+    .catch(error => {
+        console.error('Error al recordar:', error);
+        alert('Ocurrió un error al notificar. Inténtalo de nuevo.');
+    });
 }
+
 
 function downloadCSV() {
     const newTab = window.open('', '_blank');

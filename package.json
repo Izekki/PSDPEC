@@ -17,10 +17,17 @@
   },
   "homepage": "https://github.com/Izekki/PSDPEC#readme",
   "dependencies": {
+    "chart.js": "^3.9.1",
+    "chartjs-node-canvas": "^4.1.6",
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
     "express": "^4.21.1",
+    "express-mysql-session": "^3.0.3",
     "express-session": "^1.18.1",
+    "fs": "^0.0.1-security",
     "mysql2": "^3.11.3",
     "nodemailer": "^6.9.16",
+    "path": "^0.12.7",
     "xlsx": "^0.18.5"
   }
 }
