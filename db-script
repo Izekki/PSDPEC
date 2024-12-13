@@ -1,0 +1,44 @@
+-- mysql script
+
+-- Creación de la base de datos
+CREATE DATABASE IF NOT EXISTS prestamouv;
+USE prestamouv;
+
+-- Creación de la tabla 'administradores'
+CREATE TABLE administradores (
+    correo VARCHAR(50) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    contrasenia VARCHAR(100) NOT NULL
+);
+
+-- Creación de la tabla 'equipos'
+CREATE TABLE equipos (
+    id_equipo INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_equipo VARCHAR(50) NOT NULL,
+    estado ENUM('Disponible', 'No Disponible') NOT NULL
+);
+
+-- Creación de la tabla 'solicitudes'
+CREATE TABLE solicitudes (
+    id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_usuario VARCHAR(50) NOT NULL,
+    correo VARCHAR(50),
+    estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL,
+    fecha_inicio DATETIME NOT NULL,
+    fecha_entrega DATETIME NOT NULL,
+    ubicacion_actual VARCHAR(100),
+    id_equipo INT,
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
+);
+
+-- Creación de la tabla 'prestamos'
+CREATE TABLE prestamos (
+    id_prestamo INT AUTO_INCREMENT PRIMARY KEY,
+    id_solicitud INT,
+    fecha_entrega DATETIME NOT NULL,
+    fecha_devolucion DATETIME,
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL,
+    estado_prestamo ENUM('No entregado', 'Entregado') NOT NULL,
+    FOREIGN KEY (id_solicitud) REFERENCES solicitudes(id_solicitud)
+);
