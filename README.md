@@ -23,7 +23,7 @@
 4. Start the server with `node app.js`.
 
 ## Contributions
-If you would like to contribute, please fork the repository and submit your **pull requests**.
+We are considering redesigning the front-end with **React**. If you'd like to try implementing this, please fork the repository and submit a **pull request**. Alternatively, you can reach out via email at **izekitecheng@gmail.com**.
 
 ## License
 Distributed under the MIT License.
@@ -53,8 +53,7 @@ Distributed under the MIT License.
 4. Inicia el servidor con `node app.js`.
 
 ## Contribuciones
-Si deseas contribuir, por favor realiza un **fork** del repositorio y envía tus **pull requests**.
+Estamos considerando rediseñar el front-end con **React**. Si deseas intentarlo, por favor realiza un **fork** del repositorio y envía tus **pull requests**. También puedes contactarme por correo a **izekitecheng@gmail.com**.
 
 ## Licencia
 Distribuido bajo la Licencia MIT.
-
